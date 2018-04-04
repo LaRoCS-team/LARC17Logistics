@@ -1,17 +1,17 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
-#include <actionlib/GrabPuckAction.h>
+#include <grab_puck/GrabPuckAction.h>
 
 // THIS ENTIRE FILE IS A TEST
 
 class GrabPuckAction {
 private:
     ros::NodeHandle nh_;
-    actionlib::SimpleActionServer<actionlib::GrabPuckAction> as_;
+    actionlib::SimpleActionServer<grab_puck::GrabPuckAction> as_;
 
     std::string action_name_;
 
-    actionlib::GrabPuckResult result_;
+    grab_puck::GrabPuckResult result_;
 
 public:
     GrabPuckAction(std::string name) :
@@ -21,9 +21,9 @@ public:
         as_.start();
     }
 
-    void executeCB(const actionlib::GrabPuckGoalConstPtr &goal) {
-        result_.color_grabbed_puck = goal.color_id;
-        result_.grabbed_puck = true;
+    void executeCB(const grab_puck::GrabPuckGoalConstPtr &goal) {
+        result_.color_grabbed_puck.data = goal->color_id.data;
+        result_.grabbed_puck.data = true;
         as_.setSucceeded(result_);
     }
 };
