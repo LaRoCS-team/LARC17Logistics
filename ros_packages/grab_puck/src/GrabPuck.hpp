@@ -6,7 +6,7 @@
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud.h"
 #include "geometry_msgs/Twist.h"
-//#include "robotino_msgs/PuckInfo.h"
+#include "robotino_msgs/PuckInfo.h"
 #include "std_msgs/UInt64.h"
 //#include "robotino_msgs/DigitalReadings.h"
 
@@ -26,14 +26,9 @@ private:
     // ROS Handles, Publishers, Subscriber and Messages
 
     ros::Publisher cmd_vel_pub_;
-    ros::Publisher got_puck_pub_;
-    ros::Publisher led_pub_;
 
-    ros::Subscriber image_raw_sub_;
     ros::Subscriber distance_sensors_sub_;
-    ros::Subscriber has_puck_sub_;
     ros::Subscriber puck_info_sub_;
-    ros::Subscriber action_id_sub_;
 
     geometry_msgs::Twist cmd_vel_msg_;
     std_msgs::Bool got_puck_msg_;
@@ -57,12 +52,14 @@ private:
     float SPEED_VEL {0}, TURN_VEL {0};
     float PUCK_DISTANCE_REDUCE_VEL {0.3};
 
+    bool finished_grabbed_puck_;
+
     // Private Members Functions
     // Callbacks
     void cameraCallback(const sensor_msgs::Image::ConstPtr& msg);
     void IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
     void hasPuckCallback(const std_msgs::Bool::ConstPtr& msg);
-    //void puckInfoCallback(const robotino_msgs::PuckInfo_<std::allocator<void>>::ConstPtr &msg);
+    void puckInfoCallback(const robotino_msgs::PuckInfo_<std::allocator<void>>::ConstPtr &msg);
     void actionIdCallback(const std_msgs::UInt64::ConstPtr& msg);
     // Movement flags setters
     void turnLeftFlag();

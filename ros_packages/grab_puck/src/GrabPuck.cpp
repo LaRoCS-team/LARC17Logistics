@@ -6,83 +6,6 @@
 using cv::Mat;
 using std::vector;
 
-GrabPuckAction::GrabPuckAction(std::string name) :
-    as_(nh_, name, boost::bind(&GrabPuckAction::executeCB, this, _1), false),
-    action_name_(name),
-    turn_flag_(0),
-    forward_flag_(0),
-    node_loop_rate_(20)
-{
-    first_time_turn_ = true;
-
-    puck_color_ = 0;
-
-    dist_ir_.fill({0, 0, 0});
-
-    cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 100);
-    got_puck_pub_ = nh_.advertise<std_msgs::Bool>("got_puck", 100);
-    // led_pub_ = nh_.advertise<robotino_msgs::DigitalReadings>("set_digital_values", 100);
-
-    image_raw_sub_ = nh_.subscribe("image_raw", 100, &GrabPuckAction::cameraCallback, this);
-    distance_sensors_sub_ = nh_.subscribe("distance_sensors", 100, &GrabPuckAction::IRCallback, this);
-    has_puck_sub_ = nh_.subscribe("hasPuck", 100, &GrabPuckAction::hasPuckCallback, this);
-    // puck_info_sub_ = nh_.subscribe("identifyPuck", 100, &GrabPuckAction::puckInfoCallback, this);
-    action_id_sub_ = nh_.subscribe("action_id", 100, &GrabPuckAction::actionIdCallback, this);
-
-    as_.start();
-}
-
-void GrabPuckAction::executeCB(const grab_puck::GrabPuckGoalConstPtr &goal) {
-    result_.color_grabbed_puck.data = goal->color_id.data;
-    result_.grabbed_puck.data = true;
-    as_.setSucceeded(result_);
-
-    ros::Rate lr(node_loop_rate_);
-    //std::cout << "Antes do LED" << std::endl;
-    //ledPubPega(puck_color_);
-    //std::cout << "actionID:" << action_id_ << std::endl;
-
-    //std::cout << "Comecou a pegar Puck" << std::endl;
-
-    if (!has_puck_flag_) {
-        got_puck_msg_.data = static_cast<unsigned char>(false);
-
-        controlSpeed(0);
-        goToPuck();
-        //ROS_INFO("goToPuck()");
-    } else {
-        got_puck_msg_.data = static_cast<unsigned char>(true);
-
-        controlSpeed(1);
-        calculateFrontalDistances();
-
-        // TODO: PRECISA AVALIAR ESSE VALOR
-        //std::cout << "Dis2: " << dist_norm_ir_5_ << "\nDis9: " << dist_norm_ir_6_ << std::endl;
-        if (dist_norm_ir_5_ >= 0.5 || dist_norm_ir_6_ >= 0.5) {
-            //std::cout << "Comecou o turn to deliver" << std::endl;
-            if (first_time_turn_)
-            {
-                turnToDeliverSetSide();
-                first_time_turn_ = false;
-            }
-
-            turnToDeliver();
-
-        } else
-        {
-            forwardStopFlag();
-            turnStopFlag();
-        }
-    }
-
-    cmd_vel_msg_.linear.x = forward_flag_ * SPEED_VEL;
-    cmd_vel_msg_.angular.z = turn_flag_ * TURN_VEL;
-
-    cmd_vel_pub_.publish(cmd_vel_msg_);
-    got_puck_pub_.publish(got_puck_msg_);
-
-
-}
 
 int main(int argc, char** argv) {
    ros::init(argc, argv, "grab_puck");
@@ -93,14 +16,95 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+GrabPuckAction::GrabPuckAction(std::string name) :
+    as_(nh_, name, boost::bind(&GrabPuckAction::executeCB, this, _1), false),
+    action_name_(name),
+    turn_flag_(0),
+    forward_flag_(0),
+    node_loop_rate_(20)
+{
+    first_time_turn_ = true;
+    finished_grabbed_puck_ = false;
+
+    puck_color_ = 0;
+
+    dist_ir_.fill({0, 0, 0});
+
+    cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 100);
+    // got_puck_pub_ = nh_.advertise<std_msgs::Bool>("got_puck", 100);
+    // led_pub_ = nh_.advertise<robotino_msgs::DigitalReadings>("set_digital_values", 100);
+
+    // image_raw_sub_ = nh_.subscribe("image_raw", 100, &GrabPuckAction::cameraCallback, this);
+    distance_sensors_sub_ = nh_.subscribe("distance_sensors", 100, &GrabPuckAction::IRCallback, this);
+    // has_puck_sub_ = nh_.subscribe("hasPuck", 100, &GrabPuckAction::hasPuckCallback, this);
+    puck_info_sub_ = nh_.subscribe("puck_info", 100, &GrabPuckAction::puckInfoCallback, this);
+    // action_id_sub_ = nh_.subscribe("action_id", 100, &GrabPuckAction::actionIdCallback, this);
+
+    as_.start();
+}
+
+void GrabPuckAction::executeCB(const grab_puck::GrabPuckGoalConstPtr &goal) {
+    // result_.color_grabbed_puck.data = goal->color_id.data;
+    // result_.grabbed_puck.data = true;
+
+    // as_.setSucceeded(result_);
+
+    ros::Rate lr(node_loop_rate_);
+    //std::cout << "Antes do LED" << std::endl;
+    //ledPubPega(puck_color_);
+    //std::cout << "actionID:" << action_id_ << std::endl;
+
+    //std::cout << "Comecou a pegar Puck" << std::endl;
+    while (!finished_grabbed_puck_) {
+        if (!has_puck_flag_) {
+            got_puck_msg_.data = static_cast<unsigned char>(false);
+
+            controlSpeed(0);
+            goToPuck();
+            //ROS_INFO("goToPuck()");
+        }
+        else {
+            got_puck_msg_.data = static_cast<unsigned char>(true);
+
+            controlSpeed(1);
+            calculateFrontalDistances();
+
+            // TODO: PRECISA AVALIAR ESSE VALOR
+            //std::cout << "Dis2: " << dist_norm_ir_5_ << "\nDis9: " << dist_norm_ir_6_ << std::endl;
+            if (dist_norm_ir_5_ >= 0.5 || dist_norm_ir_6_ >= 0.5) {
+                //std::cout << "Comecou o turn to deliver" << std::endl;
+                if (first_time_turn_) {
+                    turnToDeliverSetSide();
+                    first_time_turn_ = false;
+                }
+
+                turnToDeliver();
+
+            }
+            else {
+                forwardStopFlag();
+                turnStopFlag();
+
+                finished_grabbed_puck_ = true;
+
+            }
+        }
+
+        cmd_vel_msg_.linear.x = forward_flag_ * SPEED_VEL;
+        cmd_vel_msg_.angular.z = turn_flag_ * TURN_VEL;
+
+        cmd_vel_pub_.publish(cmd_vel_msg_);
+    }
+
+
+    result_.grabbed_puck.data = true;
+    as_.setSucceeded(result_);
+}
+
 GrabPuckAction::~GrabPuckAction()
 {
     cmd_vel_pub_.shutdown();
-    got_puck_pub_.shutdown();
-
-    image_raw_sub_.shutdown();
     distance_sensors_sub_.shutdown();
-    has_puck_sub_.shutdown();
     puck_info_sub_.shutdown();
 }
 
@@ -145,13 +149,16 @@ void GrabPuckAction::hasPuckCallback(const std_msgs::Bool::ConstPtr& msg)
     //ROS_INFO("has_puck_flag_ %d", has_puck_flag_);
 }
 
-// void GrabPuckAction::puckInfoCallback(const robotino_msgs::PuckInfo::ConstPtr& msg)
-// {
-//     puck_center_X_ = msg->centroid.x;
-//     puck_center_Y_ = msg->centroid.y;
-//     puck_color_ = msg->color;
-//     //std::cout << "Lendo a cor" << std::endl;
-// }
+void GrabPuckAction::puckInfoCallback(const robotino_msgs::PuckInfo::ConstPtr& msg)
+{
+    puck_center_X_ = msg->centroid.x;
+    puck_center_Y_ = msg->centroid.y;
+    puck_color_ = msg->color;
+
+    // TODO: Maybe has_puck will have another name
+    //has_puck_flag_ = msg->has_puck;
+    //std::cout << "Lendo a cor" << std::endl;
+}
 
 void GrabPuckAction::actionIdCallback(const std_msgs::UInt64::ConstPtr& msg)
 {
