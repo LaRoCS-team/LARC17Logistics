@@ -1,0 +1,11 @@
+time stamp
+int32 machAmarela
+int32 machVermelha
+int32 machAzul
+uint32 task
+uint32 currPuck
+Machine[] machines
+DistrCenter[] dcs
+bool inAction
+bool terminate
+bool stuck
