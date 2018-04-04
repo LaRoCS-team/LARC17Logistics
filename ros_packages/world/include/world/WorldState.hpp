@@ -11,31 +11,16 @@
 #include <std_msgs/UInt64.h>
 #include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_msgs/GridMap.h>
-#include <robotino_msgs/WorldState.h>
-#include <robotino_msgs/StateId.h>
-#include <robotino_msgs/PuckInfo.h>
 #include "world/Pose2d.hpp"
 #include <tf/transform_broadcaster.h>
 #include <actionlib_msgs/GoalStatusArray.h>
-#include <robotino_msgs/Machine.h>
-#include <robotino_msgs/DistrCenter.h>
 #include <string>
 #include <list>
-#include "robotino_msgs/ResetOdometry.h"
 
 
 class WorldState{
 public:
     WorldState();
-    bool getHasPuck();
-    void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
-    void hasPuckCallback(const std_msgs::Bool::ConstPtr& msg);
-    void gotPuckCallback(const std_msgs::Bool::ConstPtr& msg);
-    void leftPuckCallback(const std_msgs::Bool::ConstPtr& msg);
-    void navGoalCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
-    void puckInfoCallback(const robotino_msgs::PuckInfo::ConstPtr& msg);
-    void actionCallback(const std_msgs::UInt64::ConstPtr& msg);
-    void gotColorCallback(const std_msgs::Bool::ConstPtr& msg);
     void PublishLoop();
     void drawMap();
     void update();
@@ -50,7 +35,6 @@ private:
     bool startedDelivery,  gotColor;
     Pose2d robPosition;
     long stateId;
-    robotino_msgs::ResetOdometry srv;
     std::vector<int> vpuck;
     long int action;
     long int nextAction();
@@ -83,8 +67,7 @@ private:
 
     grid_map::GridMap map;
     ros::NodeHandle nh;
-    ros::Publisher statePub, rlPub, mapPub, actPub;
-    ros::Subscriber odomSub, gotSub, leftSub, hasSub, goalSub, actionSub, gotColorSub;
+    ros::Publisher mapPub;
     ros::Rate loopRate;
     tf::TransformBroadcaster mapBroadcaster;
 };
