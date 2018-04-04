@@ -6,8 +6,8 @@ Machine::Machine(){
     task = 0; //Indefinida
     active = true;
     puckColor = 0;
-    puckCounter = 3;
-    std::cout<<"Posição da máquina indefinida"<<std::endl;
+    puckCounter = 0;
+    //std::cout<<"Posição da máquina indefinida"<<std::endl;
     id = count;
     count++;
 }

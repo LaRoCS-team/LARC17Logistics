@@ -6,13 +6,39 @@ using namespace grid_map;
 using namespace std;
 //Alterar parâmetros da competição por aqui, no construtor:
 const float res = 0.04;
-const int nMachines = 6, nDcs = 4;
+//const int nMachines = 6, nDcs = 4;
 
 WorldState::WorldState(): map({"occup"}),loopRate(5){
     //Estados booleanos
     puckColor = 0;
     task = 3;
 
+    //Necessary variables;
+    int i = 0;
+    float x = 0.0, y = 0.0, phi = 0.0;
+    char machi[10];
+    
+    //Path of configuration file; 
+    std::string file = "/home/tomb/catkin_ws/src/world/config/mapconfig.yaml";
+
+    //Load configuration file
+    YAML::Node conf = YAML::LoadFile(file);
+
+    //Readind condiguration data;
+    int nMachines = conf["Numero_maquinas"].as<int>();
+    Machine m[nMachines];
+
+    for (i = 1; i <= nMachines; i++) {
+	sprintf(machi, "Maquina%d", i);
+	x = conf[machi]["x"].as<float>();
+	y = conf[machi]["y"].as<float>();
+	phi = conf[machi]["phi"].as<float>();
+	m[i-1].setPose(x,y,phi);
+	machines.push_back(m[i-1]);
+    }
+
+
+/*
     //Definição das máquinas: pos x, pos y, orientagoal.header = msg->header;
     //ex: mi(float x,float y,float phi, int task, int color);
     Machine m1(0.65,2.43,-15, task, 0);
@@ -28,7 +54,7 @@ WorldState::WorldState(): map({"occup"}),loopRate(5){
     machines.push_back(m4);
     machines.push_back(m5);
     machines.push_back(m6);
-    
+*/    
     //Mapa
     map.setGeometry(Length(4.0, 4.0), res);
     map.setFrameId("map");
