@@ -10,8 +10,6 @@
 #include "std_msgs/UInt64.h"
 //#include "robotino_msgs/DigitalReadings.h"
 
-#include <opencv2/highgui/highgui.hpp>
-
 // THIS ENTIRE FILE IS A TEST
 
 class GrabPuckAction {
@@ -42,7 +40,6 @@ private:
     unsigned int puck_color_;
     unsigned long action_id_;
     std::array<std::array<float, 3>, 9> dist_ir_;
-    cv::Mat image_;
     int side_turn_flag_;
     // Frontal euclidean norm distances
     double dist_norm_ir_2_, dist_norm_ir_3_, dist_norm_ir_8_, dist_norm_ir_9_;
@@ -57,7 +54,7 @@ private:
 
     // Private Members Functions
     // Callbacks
-    void cameraCallback(const sensor_msgs::Image::ConstPtr& msg);
+    // void cameraCallback(const sensor_msgs::Image::ConstPtr& msg);
     void IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
     void hasPuckCallback(const std_msgs::Bool::ConstPtr& msg);
     void puckInfoCallback(const robotino_msgs::PuckInfo_<std::allocator<void>>::ConstPtr &msg);

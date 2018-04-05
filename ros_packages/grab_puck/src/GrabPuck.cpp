@@ -1,9 +1,7 @@
 #include "GrabPuck.hpp"
 
 #include "std_msgs/String.h"
-#include "cv_bridge/cv_bridge.h"
 
-using cv::Mat;
 using std::vector;
 
 
@@ -121,26 +119,26 @@ GrabPuckAction::~GrabPuckAction()
     puck_info_sub_.shutdown();
 }
 
-void GrabPuckAction::cameraCallback(const sensor_msgs::Image_<std::allocator<void>>::ConstPtr &msg)
-{
-    /**
-      * Utilizando o package cv_bridge do ROS, podemos obter um objeto do tipo Mat (OpenCV) a partir
-      * de uma mensagem do tipo sensor_msgs/Image.
-      *
-      * Utilizando um ponteiro do tipo CvImageConstPtr, obtemos o objeto Mat na forma "shared", ou
-      * seja, não faremos uma cópia dos dados, mas também não poderemos edita-los.
-      */
-    cv_bridge::CvImageConstPtr cv_cptr = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::BGR8);
-    image_ = cv_cptr->image;
-
-    /**
-      * O V-REP passa a imagem invertida no eixo X (horizontal), por isso, utilizando a função cv::flip()
-      * com o parâmetro '0', fazemos um flip no eixo X.
-      */
-    cv::flip(image_, image_, 0);
-
-    // cv::imwrite("/home/previato/catkin_ws/src/visao/image.ppm", image);
-}
+// void GrabPuckAction::cameraCallback(const sensor_msgs::Image_<std::allocator<void>>::ConstPtr &msg)
+// {
+//     /**
+//       * Utilizando o package cv_bridge do ROS, podemos obter um objeto do tipo Mat (OpenCV) a partir
+//       * de uma mensagem do tipo sensor_msgs/Image.
+//       *
+//       * Utilizando um ponteiro do tipo CvImageConstPtr, obtemos o objeto Mat na forma "shared", ou
+//       * seja, não faremos uma cópia dos dados, mas também não poderemos edita-los.
+//       */
+//     cv_bridge::CvImageConstPtr cv_cptr = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::BGR8);
+//     image_ = cv_cptr->image;
+//
+//     /**
+//       * O V-REP passa a imagem invertida no eixo X (horizontal), por isso, utilizando a função cv::flip()
+//       * com o parâmetro '0', fazemos um flip no eixo X.
+//       */
+//     cv::flip(image_, image_, 0);
+//
+//     // cv::imwrite("/home/previato/catkin_ws/src/visao/image.ppm", image);
+// }
 
 void GrabPuckAction::IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
 {
