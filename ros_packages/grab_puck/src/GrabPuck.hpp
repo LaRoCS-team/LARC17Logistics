@@ -51,6 +51,7 @@ private:
     int CAMERA_WIDTH {320}, CAMERA_HEIGHT {240};
     float SPEED_VEL {0}, TURN_VEL {0};
     float PUCK_DISTANCE_REDUCE_VEL {0.3};
+    int debug_mode_;
 
     bool finished_grabbed_puck_;
 
@@ -80,6 +81,7 @@ private:
     void ledPubPega(int color);
 
     void turnToDeliverSetSide();
+    void print(const std::string str);
 
 public:
     GrabPuckAction(std::string name);

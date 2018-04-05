@@ -16,6 +16,12 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+void GrabPuckAction::print(const std::string str) {
+    if (debug_mode_) {
+        std::cout << str << std::endl;
+    }
+}
+
 GrabPuckAction::GrabPuckAction(std::string name) :
     as_(nh_, name, boost::bind(&GrabPuckAction::executeCB, this, _1), false),
     action_name_(name),
@@ -29,6 +35,13 @@ GrabPuckAction::GrabPuckAction(std::string name) :
     puck_color_ = 0;
 
     dist_ir_.fill({0, 0, 0});
+
+    if (nh_.hasParam("debug")) {
+        nh_.getParam("debug", debug_mode_);
+    }
+    else {
+        debug_mode_ = 0;
+    }
 
     cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 100);
     // got_puck_pub_ = nh_.advertise<std_msgs::Bool>("got_puck", 100);
