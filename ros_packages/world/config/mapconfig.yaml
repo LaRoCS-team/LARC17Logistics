@@ -1,0 +1,25 @@
+Numero_maquinas: 6
+Maquina1:
+  x: 0.65
+  y: 2.15
+  phi: -15
+Maquina2:
+  x: 2.15
+  y: 2.50
+  phi: -90
+Maquina3:
+  x: 3.89
+  y: 2.50
+  phi: 180
+Maquina4:
+  x: 1.19
+  y: 1.24
+  phi: 135
+Maquina5:
+  x: 3.24
+  y: 1.48
+  phi: -135
+Maquina6:
+  x: 2.2
+  y: 0.10
+  phi: 90
