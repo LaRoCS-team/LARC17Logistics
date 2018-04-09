@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>check_puck</name>
+  <name>puck_info</name>
   <version>0.0.0</version>
   <description>The check_puck package</description>
 

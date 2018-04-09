@@ -1,4 +1,4 @@
-#include "../include/check_puck/CheckPuck.hpp"
+#include "puck_info/CheckPuck.hpp"
 #include <iostream>
 
 int main(int argc, char** argv){

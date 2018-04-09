@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "../include/fetch_puck/IdentifyPuck.hpp"
+#include "puck_info/PuckInfo.hpp"
 
 int main (int argc, char **argv)
 {

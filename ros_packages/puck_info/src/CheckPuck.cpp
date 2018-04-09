@@ -1,4 +1,4 @@
-#include "../include/check_puck/CheckPuck.hpp"
+#include "puck_info/CheckPuck.hpp"
 
 using namespace cv;
 using namespace std;
@@ -23,7 +23,7 @@ CheckPuck::CheckPuck(): loopRate(2)
 
   image_transport::ImageTransport it(n);
   sensorSub = n.subscribe("distance_sensors", 10, &CheckPuck::sensorCallback, this);
-    puck_info_sub_ = n.subscribe("identifyPuck", 10, &CheckPuck::puckInfoCallback, this);
+    puck_info_sub_ = n.subscribe("PuckInfo", 10, &CheckPuck::puckInfoCallback, this);
 
 
     //image_transport::ImageTransport imgTrans(n);

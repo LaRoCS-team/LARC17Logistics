@@ -1,5 +1,5 @@
 #include <std_msgs/UInt64.h>
-#include "../include/fetch_puck/IdentifyPuck.hpp"
+#include "puck_info/PuckInfo.hpp"
 
 using namespace std;
 using namespace cv;
@@ -34,7 +34,7 @@ void IdentifyPuck::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     return;
   }
 
-  cv_ptr->image.copyTo(frame, cv_ptr->image);
+  //cv_ptr->image.copyTo(frame, cv_ptr->image);
 
   // Color to be detected
   // [0] Min Blue
