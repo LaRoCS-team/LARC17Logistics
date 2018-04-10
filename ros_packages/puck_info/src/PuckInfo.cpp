@@ -3,12 +3,21 @@
 //
 
 #include "puck_info/PuckInfo.hpp"
+#include "puck_info/PuckInfo.h"
 
 #include <std_msgs/UInt64.h>
-#include "puck_info/PuckInfo.hpp"
 
 using namespace std;
 using namespace cv;
+
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "puck_info");
+
+    PuckInfo puck_info;
+    puck_info.spin();
+
+    return 0;
+}
 
 PuckInfo::PuckInfo(): loopRate(2)
 {
@@ -16,9 +25,9 @@ PuckInfo::PuckInfo(): loopRate(2)
 
     image_transport::ImageTransport imgTrans(node);
     imgSub = imgTrans.subscribe("image_raw", 2, &PuckInfo::imageCallback, this);
-    actionIdSub = node.subscribe("action_id", 2, &PuckInfo::actionIdCallback, this);
+    sensor_sub_ = node.subscribe("distance_sensors", 10, &PuckInfo::sensorCallback, this);
 
-    pub = node.advertise<robotino_msgs::PuckInfo>("PuckInfo", 10);
+    pub = node.advertise<puck_info::PuckInfo>("puck_info", 10);
 
     image_transport::ImageTransport it(node);
     teste_pub_ = it.advertise("tamo_sofrendo", 1);
@@ -32,7 +41,7 @@ void PuckInfo::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
     try
     {
-        cv_ptr = cv_bridge::toCvCopy(msg);
+        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e)
     {
@@ -40,7 +49,7 @@ void PuckInfo::imageCallback(const sensor_msgs::ImageConstPtr& msg)
         return;
     }
 
-    //cv_ptr->image.copyTo(frame, cv_ptr->image);
+    cv_ptr->image.copyTo(frame, cv_ptr->image);
 
     // Color to be detected
     // [0] Min Blue
@@ -69,11 +78,6 @@ void PuckInfo::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
     // if(waitKey(30) >= 0 && DEBUG)
     //   break;
-}
-
-void PuckInfo::actionIdCallback(const std_msgs::UInt64::ConstPtr& msg)
-{
-    action_id_ = msg->data;
 }
 
 // Initialize the range of all three the detectable colors
@@ -234,6 +238,7 @@ pair<int, Point> PuckInfo::findPuck(Mat frame, vector<Scalar> colors, int desire
     int larger = 0, largerId = 0;
     pair<int, pair<Point, int> > largerCentroid;
 
+
     cvtColor(frame, hsv, COLOR_RGB2HSV);
 
     if(desiredColor != -1)
@@ -265,19 +270,54 @@ pair<int, Point> PuckInfo::findPuck(Mat frame, vector<Scalar> colors, int desire
     return pair<int, Point>(largerId / 2, largerCentroid.second.first);
 }
 
+double normDistance(const double a, const double b, const double c) {
+    return sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2));
+}
+
+void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
+{
+    //cout << "Estou no callback" << endl;
+    distance_x_ = msg->points[0].x;
+    distance_y_ = msg->points[0].y;
+    distance_z_ = msg->points[0].z;
+
+    double distance = normDistance(distance_x_, distance_y_, distance_z_);
+    //std::cout<<distance;
+    if(distance < 0.25) {
+        grabbed_puck_ = true;
+        has_puck_sensor_ = true;
+        //std::cout<< "PuckSensor:" << puckSensor<<"\n";
+    }
+    else {
+        if (grabbed_puck_ && distance < 0.3) {
+            has_puck_sensor_ = true;
+        }
+        else {
+            has_puck_sensor_ = false;
+            grabbed_puck_ = false;
+        }
+    }
+
+    has_puck_ = has_puck_sensor_;
+    //ROS_INFO("ha = %s, distancex = %f, distancey = %f, distancez = %f", ha?"true":"false", distance, distancey, distancez);
+}
 
 
 void PuckInfo::spin()
 {
     ros::Rate lr(loopRate);
     while (node.ok()) {
-        // Setting ROS mesage
-        robotino_msgs::PuckInfo puckInfo;
-        puckInfo.color = puck.first;
-        puckInfo.centroid.x = puck.second.x;
-        puckInfo.centroid.y = puck.second.y;
 
-        pub.publish(puckInfo);
+
+        // Setting ROS mesage
+        puck_info::PuckInfo puck_info_msg;
+        puck_info_msg.color = puck.first;
+        puck_info_msg.center.x = puck.second.x;
+        puck_info_msg.center.y = puck.second.y;
+        puck_info_msg.center.z = 0;
+        puck_info_msg.has_puck = has_puck_;
+
+        pub.publish(puck_info_msg);
         teste_pub_.publish(msg);
 
         ros::spinOnce();

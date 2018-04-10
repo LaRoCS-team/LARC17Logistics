@@ -24,9 +24,12 @@
 #include <vector>
 #include <utility>
 #include <string>
+#include <cmath>
 
 using std::vector;
 using std::pair;
+using std::pow;
+using std::sqrt;
 
 using cv::Mat;
 using cv::Scalar;
@@ -48,7 +51,6 @@ private:
     image_transport::Publisher teste_pub_;
     sensor_msgs::ImagePtr msg;
 
-    unsigned long action_id_;
     double objMinSize;
     double objMaxSize;
     pair<int, Point> puck;
@@ -56,17 +58,24 @@ private:
     pair<int, pair<Point, int> > detectColor(Mat frame, Mat hsv, Scalar minColor, Scalar maxColor, int colorIndex);
     Mat getTreatedInRangeHSV(Mat hsv, Scalar minColor, Scalar maxColor);
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
-    void actionIdCallback(const std_msgs::UInt64::ConstPtr& msg);
     pair<Mat, pair<Point, int> > filterCentroid(Mat frame, Mat mask, Mat labels, Mat status, Mat centroids, int i);
     vector<Scalar> initColorVector(vector<Scalar> colors);
 
     NodeHandle node;
     Publisher pub;
     Subscriber camSub;
-    Subscriber actionIdSub;
+    Subscriber sensor_sub_;
 
     Rate loopRate;
     image_transport::Subscriber imgSub;
+    double distance_x_, distance_y_, distance_z_;
+    bool grabbed_puck_ {false};
+    bool has_puck_sensor_ {false};
+
+    bool has_puck_ {false};
+
+
+    void sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
 };
 
 
