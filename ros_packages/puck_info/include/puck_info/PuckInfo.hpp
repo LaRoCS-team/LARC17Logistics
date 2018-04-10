@@ -41,7 +41,8 @@ class PuckInfo {
 public:
     PuckInfo();
     // Set true to enable debugging mode
-    bool DEBUG;
+    bool debug_mode_;
+    bool vrep_mode_;
 
     pair<int, Point> findPuck(Mat frame, vector<Scalar> colors, int desiredColor);
     void spin();
@@ -74,8 +75,11 @@ private:
 
     bool has_puck_ {false};
 
+    cv::Mat frame_;
+
 
     void sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
+    void print(const std::string str);
 };
 
 
