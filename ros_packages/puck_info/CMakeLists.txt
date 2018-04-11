@@ -58,7 +58,7 @@ add_message_files(
    DIRECTORY
    msg
    FILES
-   PuckInfo.msg
+   PuckInfoMsg.msg
  )
 
 ## Generate services in the 'srv' folder
