@@ -3,7 +3,7 @@
     //
 
     #include "ros/ros.h"
-    #include "DeliverPuck.hpp"
+    #include "../include/deliver_puck/DeliverPuck.hpp"
 
     int main(int argc, char **argv)
     {

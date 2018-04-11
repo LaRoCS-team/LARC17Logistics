@@ -2,7 +2,6 @@
 // Created by rafael on 05/11/17.
 //
 
-
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
 #include "sensor_msgs/Image.h"
@@ -11,30 +10,47 @@
 #include "cv_bridge/cv_bridge.h"
 #include <opencv2/highgui/highgui.hpp>
 #include "robotino_msgs/ResetOdometry.h"
-#include "DeliverPuck.hpp"
+#include "../include/deliver_puck/DeliverPuck.hpp"
 
 
 using namespace std;
 using namespace cv;
 
-DeliverPuck::DeliverPuck():
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "deliver_puck");
+
+    DeliverPuck deliver_puck("deliver_puck");
+    ros::spin();
+
+    return 0;
+}
+
+void DeliverPuck::print(const std::string str) {
+    if (debug_mode_) {
+        std::cout << str << std::endl;
+    }
+}
+
+DeliverPuck::DeliverPuck(std::string name) :
+        as_(n_, name, boost::bind(&DeliverPuck::executeCB, this), false),
+        action_name_(name),
         node_loop_rate(20)
 {
-    ROS_INFO("Instantiating DeliverPuck class");
+    //ROS_INFO("Instantiating DeliverPuck class");
     //Topic you want to publish
     cmd_vel_pub = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-    delivered_puck_pub = n_.advertise<std_msgs::Bool>("delivered_puck", 1000);
-    client = n_.serviceClient<robotino_msgs::ResetOdometry>("reset_odometry");
-    set_digital_readings_pub = n_.advertise<robotino_msgs::DigitalReadings>("set_digital_values", 100);
+    //delivered_puck_pub = n_.advertise<std_msgs::Bool>("delivered_puck", 1000);
+    //client = n_.serviceClient<robotino_msgs::ResetOdometry>("reset_odometry");
+    //set_digital_readings_pub = n_.advertise<robotino_msgs::DigitalReadings>("set_digital_values", 100);
 
     //Topic you want to subscribe
     image_raw_sub = n_.subscribe("image_raw", 1000, &DeliverPuck::visionCallback, this);
     distance_sensors_sub = n_.subscribe("distance_sensors", 1000, &DeliverPuck::distanceCallback, this);
-    has_puck_sub = n_.subscribe("hasPuck", 1000, &DeliverPuck::hasPuckCallback, this);
-    world_state_sub = n_.subscribe("world_state", 1000, &DeliverPuck::worldStateCallback, this);
-    action_id_sub = n_.subscribe("action_id", 1000, &DeliverPuck::actionIdCallback, this);
+    //has_puck_sub = n_.subscribe("hasPuck", 1000, &DeliverPuck::hasPuckCallback, this);
+    //world_state_sub = n_.subscribe("world_state", 1000, &DeliverPuck::worldStateCallback, this);
+    //action_id_sub = n_.subscribe("action_id", 1000, &DeliverPuck::actionIdCallback, this);
     digital_readings_sub = n_.subscribe("digital_readings", 1000, &DeliverPuck::digitalReadingsCallback, this);
-    puck_info_sub = n_.subscribe("identifyPuck", 1000, &DeliverPuck::puckInfoCallback, this);
+    puck_info_sub = n_.subscribe("puck_info", 1000, &DeliverPuck::puckInfoCallback, this);
 
     aligned_horizontal_flag = false;
     stop_flag = false;
@@ -49,6 +65,8 @@ DeliverPuck::DeliverPuck():
     {
         (set_digital_readings_msg.values).push_back(0);
     }
+
+    as_.start();
 }
 
 DeliverPuck::~DeliverPuck()
@@ -65,8 +83,9 @@ DeliverPuck::~DeliverPuck()
     puck_info_sub.shutdown();
 }
 
-void DeliverPuck::puckInfoCallback (const robotino_msgs::PuckInfo::ConstPtr& msg) {
-    y_centroid = msg->centroid.y;
+void DeliverPuck::puckInfoCallback (const puck_info::PuckInfoMsg::ConstPtr& msg) {
+    y_centroid = msg->center.y;
+    has_puck_flag = msg->has_puck;
     ROS_INFO("y_centroid = %g", y_centroid);
 
 }
@@ -253,6 +272,67 @@ void DeliverPuck::reset_odometry() {
 
 }
 
+void DeliverPuck::executeCB() {
+    ros::Rate lr(node_loop_rate);
+
+    while (!deliver_puck_msg.data) {
+        //if (state_id == DELIVER_PUCK_ID) {
+        std::vector<cv::Vec4i> lines;
+        HoughLinesP(image_, lines, 1, CV_PI / 180, 75, 50, 10);
+        ROS_INFO("lines = %ld", lines.size());
+
+        cmd_vel_msg.angular.z = 0;
+        cmd_vel_msg.linear.x = 0;
+        calculate_slope(lines);
+        if (!has_puck_flag) {
+            ROS_INFO("Has puck is false");
+            //TODO:Condicao para indicar que o comportamento falhou e devemos mudá-lo
+            deliver_puck_msg.data = static_cast<unsigned char>(true);
+        } else {
+            ROS_INFO("Has puck is true");
+            deliver_puck_msg.data = static_cast<unsigned char>(false);
+            if (!aligned_horizontal_flag) {
+                align_horizontal();
+            } else {
+                if (!aligned_vertical_flag) {
+                    align_vertical();
+                } else {
+                    if (!stop_flag) {
+                        move_to_distribution_center(lines);
+                    } else {
+                        if (!first_finish_call_flag) {
+//                            reset_odometry();
+                            set_digital_readings_pub.publish(set_digital_readings_msg);
+                            first_finish_call_flag = true;
+
+                        } else {
+                            if (!finished_flag) {
+                                finish_delivery();
+                            } else {
+                                deliver_puck_msg.data = static_cast<unsigned char>(true);
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+//            cmd_vel_msg.linear.y = .1;
+//            if (avgX > 280) {
+//                cmd_vel_msg.linear.y = 0;
+//            }
+        ROS_INFO("linear.x = %f, linear.y = %f", cmd_vel_msg.linear.x, cmd_vel_msg.linear.y);
+        ROS_INFO("angular.z = %f", cmd_vel_msg.angular.z);
+        cmd_vel_pub.publish(cmd_vel_msg);
+        //delivered_puck_pub.publish(deliver_puck_msg);
+    }
+
+    result_.delivered = true;
+    as_.setSucceeded(result_);
+}
+
+/*
 void DeliverPuck::spin() {
     ros::Rate lr(node_loop_rate);
 
@@ -318,5 +398,4 @@ void DeliverPuck::spin() {
         lr.sleep();
     }
 }
-
-
+*/

@@ -1,9 +1,9 @@
 # Define the goal
-std_msgs/Int32 color_id             # Specify which puck color we want to grab
+int32 color_id             # Specify which puck color we want to grab
 ---
 # Define the result
-std_msgs/Int32 color_grabbed_puck   # Color of the grabbed puck
-std_msgs/Bool grabbed_puck          # Grabbed the puck or not (incorrect puck)
+int32 color_grabbed_puck   # Color of the grabbed puck
+bool grabbed_puck          # Grabbed the puck or not (incorrect puck)
 ---
 # Define a feedback message
 # No feedback defined

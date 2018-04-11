@@ -3,7 +3,7 @@
 //
 
 #include "puck_info/PuckInfo.hpp"
-#include "puck_info/PuckInfo.h"
+#include "puck_info/PuckInfoMsg.h"
 
 #include <std_msgs/UInt64.h>
 
@@ -34,7 +34,7 @@ PuckInfo::PuckInfo(): loopRate(2)
     imgSub = imgTrans.subscribe("image_raw", 2, &PuckInfo::imageCallback, this);
     sensor_sub_ = node.subscribe("distance_sensors", 10, &PuckInfo::sensorCallback, this);
 
-    pub = node.advertise<puck_info::PuckInfo>("puck_info", 10);
+    pub = node.advertise<puck_info::PuckInfoMsg>("puck_info", 10);
 
     image_transport::ImageTransport it(node);
     teste_pub_ = it.advertise("tamo_sofrendo", 1);
@@ -361,7 +361,7 @@ void PuckInfo::spin()
     ros::Rate lr(loopRate);
     while (node.ok()) {
         // Setting ROS mesage
-        puck_info::PuckInfo puck_info_msg;
+        puck_info::PuckInfoMsg puck_info_msg;
         puck_info_msg.color = puck.first;
         puck_info_msg.center.x = puck.second.x;
         puck_info_msg.center.y = puck.second.y;
