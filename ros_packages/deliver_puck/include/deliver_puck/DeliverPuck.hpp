@@ -18,7 +18,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <robotino_msgs/DigitalReadings.h>
 #include "robotino_msgs/WorldState.h"
-#include "robotino_msgs/PuckInfo.h"
+#include <puck_info/PuckInfoMsg.h>
 
 
 using namespace ros;
@@ -37,6 +37,7 @@ private:
     NodeHandle n_;
 
     actionlib::SimpleActionServer<deliver_puck::DeliverPuckAction> as_;
+    deliver_puck::DeliverPuckResult result_;
 
     Publisher cmd_vel_pub;
     Publisher delivered_puck_pub;
@@ -103,7 +104,7 @@ private:
     void worldStateCallback(const robotino_msgs::WorldState::ConstPtr& msg);
     void actionIdCallback (const std_msgs::UInt64::ConstPtr& msg);
     void digitalReadingsCallback (const robotino_msgs::DigitalReadings::ConstPtr& msg);
-    void puckInfoCallback (const robotino_msgs::PuckInfo::ConstPtr& msg);
+    void puckInfoCallback (const puck_info::PuckInfoMsg::ConstPtr& msg);
 
     //Helper functions
     void calculate_slope(std::vector<cv::Vec4i> lines);

@@ -9,6 +9,7 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
         roscpp
+        puck_info
         robotino_msgs
         sensor_msgs
         std_msgs
@@ -116,7 +117,7 @@ generate_messages(
 catkin_package(
    INCLUDE_DIRS include
 #  LIBRARIES visao
-   CATKIN_DEPENDS roscpp cv_bridge std_msgs actionlib_msgs
+   CATKIN_DEPENDS roscpp cv_bridge std_msgs actionlib_msgs puck_info
 #  DEPENDS system_lib
 )
 
