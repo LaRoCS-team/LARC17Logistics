@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   roscpp
   rospy
+  robotino_msgs 
   std_msgs
 )
 
@@ -64,17 +65,19 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+ add_action_files(
+   DIRECTORY
+   action
+   FILES
+   Goal.action
+)
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   actionlib_msgs#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   actionlib_msgs
+   std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
