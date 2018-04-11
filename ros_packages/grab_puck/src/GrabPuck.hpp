@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <grab_puck/GrabPuckAction.h>
+#include <puck_info/PuckInfoMsg.h>
 
 #include "std_msgs/Bool.h"
 #include "sensor_msgs/Image.h"
@@ -37,7 +38,7 @@ private:
     int turn_flag_, forward_flag_;
     bool has_puck_flag_, first_time_turn_;
     int node_loop_rate_;
-    unsigned int puck_color_;
+    long puck_color_;
     unsigned long action_id_;
     std::array<std::array<float, 3>, 9> dist_ir_;
     int side_turn_flag_;
@@ -48,7 +49,9 @@ private:
     int CAMERA_WIDTH {320}, CAMERA_HEIGHT {240};
     float SPEED_VEL {0}, TURN_VEL {0};
     float PUCK_DISTANCE_REDUCE_VEL {0.3};
-    int debug_mode_;
+    bool debug_mode_;
+
+    int goal_;
 
     bool finished_grabbed_puck_;
 
@@ -57,7 +60,7 @@ private:
     // void cameraCallback(const sensor_msgs::Image::ConstPtr& msg);
     void IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
     void hasPuckCallback(const std_msgs::Bool::ConstPtr& msg);
-    void puckInfoCallback(const robotino_msgs::PuckInfo_<std::allocator<void>>::ConstPtr &msg);
+    void puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& msg);
     void actionIdCallback(const std_msgs::UInt64::ConstPtr& msg);
     // Movement flags setters
     void turnLeftFlag();
@@ -79,10 +82,12 @@ private:
 
     void turnToDeliverSetSide();
     void print(const std::string str);
+    void goalCB();
+    void preemptCB();
 
 public:
-    GrabPuckAction(std::string name);
+    explicit GrabPuckAction(std::string name);
     ~GrabPuckAction();
 
-    void executeCB(const grab_puck::GrabPuckGoalConstPtr &goal);
+    void spin();
 };

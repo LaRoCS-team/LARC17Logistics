@@ -8,8 +8,8 @@ using std::vector;
 int main(int argc, char** argv) {
    ros::init(argc, argv, "grab_puck");
 
-   GrabPuckAction grab_puck("grab_puck");
-   ros::spin();
+   GrabPuckAction grab_puck(ros::this_node::getName());
+   grab_puck.spin();
 
     return 0;
 }
@@ -21,12 +21,13 @@ void GrabPuckAction::print(const std::string str) {
 }
 
 GrabPuckAction::GrabPuckAction(std::string name) :
-    as_(nh_, name, boost::bind(&GrabPuckAction::executeCB, this, _1), false),
+    as_(nh_, name, false),
     action_name_(name),
     turn_flag_(0),
     forward_flag_(0),
     node_loop_rate_(20)
 {
+    std::cout << "t1" << std::endl;
     first_time_turn_ = true;
     finished_grabbed_puck_ = false;
 
@@ -34,11 +35,11 @@ GrabPuckAction::GrabPuckAction(std::string name) :
 
     dist_ir_.fill({0, 0, 0});
 
-    if (nh_.hasParam("debug")) {
-        nh_.getParam("debug", debug_mode_);
+    if (nh_.hasParam("grab_puck/debug")) {
+        nh_.getParam("grab_puck/debug", debug_mode_);
     }
     else {
-        debug_mode_ = 0;
+        debug_mode_ = false;
     }
 
     cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 100);
@@ -51,65 +52,91 @@ GrabPuckAction::GrabPuckAction(std::string name) :
     puck_info_sub_ = nh_.subscribe("puck_info", 100, &GrabPuckAction::puckInfoCallback, this);
     // action_id_sub_ = nh_.subscribe("action_id", 100, &GrabPuckAction::actionIdCallback, this);
 
+    as_.registerGoalCallback(boost::bind(&GrabPuckAction::goalCB, this));
+    as_.registerPreemptCallback(boost::bind(&GrabPuckAction::preemptCB, this));
+
     as_.start();
+    std::cout << "t2" << std::endl;
 }
 
-void GrabPuckAction::executeCB(const grab_puck::GrabPuckGoalConstPtr &goal) {
+void GrabPuckAction::goalCB() {
+    goal_ = as_.acceptNewGoal()->color_id;
+    print("New goal set.");
+    std::cout << "t3" << std::endl;
+}
+
+void GrabPuckAction::preemptCB() {
+    print(action_name_ + ": Preempted");
+    // set the action state to preempted
+    as_.setPreempted();
+}
+
+void GrabPuckAction::spin() {
     // result_.color_grabbed_puck.data = goal->color_id.data;
     // result_.grabbed_puck.data = true;
 
     // as_.setSucceeded(result_);
 
     ros::Rate lr(node_loop_rate_);
-    //std::cout << "Antes do LED" << std::endl;
-    //ledPubPega(puck_color_);
-    //std::cout << "actionID:" << action_id_ << std::endl;
+    std::cout << "t4" << std::endl;
 
-    //std::cout << "Comecou a pegar Puck" << std::endl;
-    while (!finished_grabbed_puck_) {
-        if (!has_puck_flag_) {
-            got_puck_msg_.data = static_cast<unsigned char>(false);
+    while (nh_.ok()) {
+        //std::cout << "Antes do LED" << std::endl;
+        //ledPubPega(puck_color_);
+        //std::cout << "actionID:" << action_id_ << std::endl;
+        if (!as_.isActive()) {
+            print("No Goal active");
+        } else {
+            //std::cout << "Comecou a pegar Puck" << std::endl;
+            if (!finished_grabbed_puck_) {
+                if (!has_puck_flag_) {
+                    print("Going to Puck");
+                    got_puck_msg_.data = static_cast<unsigned char>(false);
 
-            controlSpeed(0);
-            goToPuck();
-            //ROS_INFO("goToPuck()");
-        }
-        else {
-            got_puck_msg_.data = static_cast<unsigned char>(true);
+                    controlSpeed(0);
+                    goToPuck();
+                    //ROS_INFO("goToPuck()");
+                } else {
+                    got_puck_msg_.data = static_cast<unsigned char>(true);
 
-            controlSpeed(1);
-            calculateFrontalDistances();
+                    controlSpeed(1);
+                    calculateFrontalDistances();
 
-            // TODO: PRECISA AVALIAR ESSE VALOR
-            //std::cout << "Dis2: " << dist_norm_ir_5_ << "\nDis9: " << dist_norm_ir_6_ << std::endl;
-            if (dist_norm_ir_5_ >= 0.5 || dist_norm_ir_6_ >= 0.5) {
-                //std::cout << "Comecou o turn to deliver" << std::endl;
-                if (first_time_turn_) {
-                    turnToDeliverSetSide();
-                    first_time_turn_ = false;
+                    // TODO: PRECISA AVALIAR ESSE VALOR
+                    std::cout << "Dis5: " << dist_norm_ir_5_ << "\nDis6: " << dist_norm_ir_6_ << std::endl;
+                    if (dist_norm_ir_5_ >= 0.5 || dist_norm_ir_6_ >= 0.5) {
+                        //std::cout << "Comecou o turn to deliver" << std::endl;
+                        if (first_time_turn_) {
+                            turnToDeliverSetSide();
+                            first_time_turn_ = false;
+                        }
+
+                        turnToDeliver();
+                        print("Turning to Deliver");
+
+                    } else {
+                        forwardStopFlag();
+                        turnStopFlag();
+
+                        finished_grabbed_puck_ = true;
+                        print("Delivered");
+
+                    }
                 }
 
-                turnToDeliver();
+                cmd_vel_msg_.linear.x = forward_flag_ * SPEED_VEL;
+                cmd_vel_msg_.angular.z = turn_flag_ * TURN_VEL;
 
-            }
-            else {
-                forwardStopFlag();
-                turnStopFlag();
-
-                finished_grabbed_puck_ = true;
-
+                cmd_vel_pub_.publish(cmd_vel_msg_);
+            } else {
+                result_.grabbed_puck = true;
+                as_.setSucceeded(result_);
             }
         }
 
-        cmd_vel_msg_.linear.x = forward_flag_ * SPEED_VEL;
-        cmd_vel_msg_.angular.z = turn_flag_ * TURN_VEL;
-
-        cmd_vel_pub_.publish(cmd_vel_msg_);
+        lr.sleep();
+        ros::spinOnce();
     }
-
-
-    result_.grabbed_puck.data = true;
-    as_.setSucceeded(result_);
 }
 
 GrabPuckAction::~GrabPuckAction()
@@ -160,11 +187,13 @@ void GrabPuckAction::hasPuckCallback(const std_msgs::Bool::ConstPtr& msg)
     //ROS_INFO("has_puck_flag_ %d", has_puck_flag_);
 }
 
-void GrabPuckAction::puckInfoCallback(const robotino_msgs::PuckInfo::ConstPtr& msg)
+void GrabPuckAction::puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& msg)
 {
-    puck_center_X_ = msg->centroid.x;
-    puck_center_Y_ = msg->centroid.y;
+    puck_center_X_ = msg->center.x;
+    puck_center_Y_ = msg->center.y;
+    print("CenterY: " + std::to_string(puck_center_Y_));
     puck_color_ = msg->color;
+    has_puck_flag_ = msg->has_puck;
 
     // TODO: Maybe has_puck will have another name
     //has_puck_flag_ = msg->has_puck;
@@ -253,7 +282,7 @@ void GrabPuckAction::controlSpeed(int sub_action)
             TURN_VEL = 0.16;
         } else
         {
-            TURN_VEL = 0.075;
+            TURN_VEL = 0.08;
         }
     }
     else if (sub_action == 1)

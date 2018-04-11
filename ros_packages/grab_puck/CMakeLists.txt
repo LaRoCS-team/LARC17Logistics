@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   robotino_msgs
+  puck_info
   genmsg
   actionlib
   actionlib_msgs
