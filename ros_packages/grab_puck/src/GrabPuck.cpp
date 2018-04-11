@@ -137,6 +137,9 @@ void GrabPuckAction::spin() {
         lr.sleep();
         ros::spinOnce();
     }
+    
+    result_.grabbed_puck = true;
+    as_.setSucceeded(result_);
 }
 
 GrabPuckAction::~GrabPuckAction()
