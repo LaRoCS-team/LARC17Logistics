@@ -108,7 +108,7 @@ void GrabPuckAction::executeCB(const grab_puck::GrabPuckGoalConstPtr &goal) {
     }
 
 
-    result_.grabbed_puck.data = true;
+    result_.grabbed_puck = true;
     as_.setSucceeded(result_);
 }
 
