@@ -1,0 +1,9 @@
+# Define the goal
+# No goal defined
+---
+# Define the result
+bool delivered          # Delivered the puck or not (could not deliver)
+# Dont know if this is important -> bool collided           # Collided with an Arena object
+---
+# Define a feedback message
+# No feedback defined
