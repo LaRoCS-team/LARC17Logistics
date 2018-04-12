@@ -1,5 +1,5 @@
-#ifndef WorldState_H
-#define WorldState_H
+#ifndef MapCreator_H
+#define MapCreator_H
 
 #include <ros/ros.h>
 #include <iostream>
@@ -18,9 +18,9 @@
 #include <list>
 
 
-class WorldState{
+class MapCreator{
 public:
-    WorldState();
+    MapCreator();
     void PublishLoop();
     void drawMap();
     void update();
@@ -54,7 +54,7 @@ private:
     bool identifyColor      = false;
     bool verifyColor        = false;
 
-    int resetMachine    =0;
+    int resetMachine    = 0;
 
     int  destinyDC      = 0;
     bool goingToDC      = false;
