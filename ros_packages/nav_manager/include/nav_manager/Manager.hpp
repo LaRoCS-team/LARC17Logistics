@@ -22,7 +22,7 @@ public:
 
 private:
 	ros::NodeHandle nh;
-actionlib::SimpleActionServer<nav_manager::GoalAction> as_;
+	actionlib::SimpleActionServer<nav_manager::NavManagerAction> as_;
 	ros::Subscriber dist_sensors_sub;
 	ros::Publisher goToGoal, cancelGoal;
 		

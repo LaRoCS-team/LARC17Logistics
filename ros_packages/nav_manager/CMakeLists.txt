@@ -70,7 +70,7 @@ find_package(Boost REQUIRED COMPONENTS system)
    DIRECTORY
    action
    FILES
-   Goal.action
+   NavManager.action
 )
 
 ## Generate added messages and services with any dependencies listed here
