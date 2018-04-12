@@ -15,6 +15,6 @@ world)/config/world.yaml" />
 </node>
 
 <!-- Launch RViz with the demo configuration -->
-<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/map_creator_rviz.rviz"/>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/world_rviz.rviz"/>
 
 </launch>

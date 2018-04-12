@@ -1,9 +1,8 @@
-# Define the goal
-int32 id             # Specify which machine/dc robotino must go to
+#goal definition
+int32 order
 ---
-# Define the result  
-bool goal_reached          # Reached destination or not
+#result definition
+bool sequence
 ---
-# Define a feedback message
-# No feedback defined
-
+#feedback
+bool sequence

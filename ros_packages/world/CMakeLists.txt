@@ -25,7 +25,6 @@ find_package(catkin REQUIRED COMPONENTS
   filters
   tf
   actionlib_msgs
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -64,12 +63,11 @@ find_package(octomap REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-    FILES
-    State.msg
-    Machine.msg
-    DistrCenter.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -85,12 +83,11 @@ add_message_files(
 #   Action2.action
 # )
 
-# Generate added messages and services with any dependencies listed here
-generate_messages(
-   DEPENDENCIES
-   std_msgs
-   geometry_msgs
- )
+## Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -124,7 +121,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES world
-  CATKIN_DEPENDS std_msgs geometry_msgs
+  CATKIN_DEPENDS
 #  DEPENDS system_lib
 )
 
@@ -155,8 +152,7 @@ include
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-#add_executable(${PROJECT_NAME}_node src/world_node.cpp src/State.cpp src/Machine.cpp src/DistrCenter.cpp)
-add_executable(${PROJECT_NAME}_node src/map_creator_node.cpp src/MapCreator.cpp src/Machine.cpp src/DistrCenter.cpp)
+add_executable(${PROJECT_NAME}_node src/world_node.cpp src/WorldState.cpp src/Machine.cpp src/DistrCenter.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

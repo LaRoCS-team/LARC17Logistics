@@ -1,4 +1,4 @@
-#include "world/MapCreator.hpp"
+#include "world/WorldState.hpp"
 #include <string>
 #include <yaml-cpp/yaml.h>
 
@@ -8,7 +8,7 @@ using namespace std;
 const float res = 0.04;
 //const int nMachines = 6, nDcs = 4;
 
-MapCreator::MapCreator(): map({"occup"}),loopRate(5){
+WorldState::WorldState(): map({"occup"}),loopRate(5){
     //Estados booleanos
     puckColor = 0;
     task = 3;
@@ -37,6 +37,24 @@ MapCreator::MapCreator(): map({"occup"}),loopRate(5){
 	machines.push_back(m[i-1]);
     }
 
+
+/*
+    //Definição das máquinas: pos x, pos y, orientagoal.header = msg->header;
+    //ex: mi(float x,float y,float phi, int task, int color);
+    Machine m1(0.65,2.43,-15, task, 0);
+    Machine m2(2.15,2.50,-90, task, 0);
+    Machine m3(3.89,2.50,180, task, 0);
+    Machine m4(1.19,1.24,135, task, 0);
+    Machine m5(3.24,1.48,-135, task, 0);
+    Machine m6(2.2,0.10,90, task, 0);
+    //Add ao vetor de máquinas
+    machines.push_back(m1);
+    machines.push_back(m2);
+    machines.push_back(m3);
+    machines.push_back(m4);
+    machines.push_back(m5);
+    machines.push_back(m6);
+*/    
     //Mapa
     map.setGeometry(Length(4.0, 4.0), res);
     map.setFrameId("map");
@@ -47,7 +65,7 @@ MapCreator::MapCreator(): map({"occup"}),loopRate(5){
     mapPub = nh.advertise<grid_map_msgs::GridMap>("world_map", 1000, true);
 }
 
-void MapCreator::PublishLoop(){
+void WorldState::PublishLoop(){
     //Publicar tf
     ros::Time time = ros::Time::now();
     geometry_msgs::Quaternion quat = tf::createQuaternionMsgFromYaw(0);
@@ -67,7 +85,7 @@ void MapCreator::PublishLoop(){
     mapPub.publish(mapMsg);
 }
 
-void MapCreator::drawMap(){
+void WorldState::drawMap(){
         grid_map::Position start;
         grid_map::Position end;
         Pose2d poseMeters;
