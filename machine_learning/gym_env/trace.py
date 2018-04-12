@@ -9,7 +9,7 @@ reader = csv.reader(f, delimiter=",")
 
 r = [float(row[0]) for row in reader]
 
-print("Avg: %s" %(sum(r)/len(r)))
+print("Avg: %s, episodes: %s" %(sum(r)/len(r), len(r)))
 
 plt.plot(range(len(r)), r)
 plt.show()

@@ -1,16 +1,18 @@
-import pygame
+import pygame, math
 
 class Entity:
-    def __init__(self, pos, identifier):
+    def __init__(self, pos, identifier, discrete_pos):
+        self.discrete_position = discrete_pos
         self.position = pos
         self.identifier = identifier
 
 
 class Robot(Entity):
-    def __init__(self, pos, identifier):
-        super().__init__(pos, identifier)
+    def __init__(self, pos, identifier, discrete_pos):
+        super().__init__(pos, identifier, discrete_pos)
         self.current_in = None
         self.carring = None
+        self.traveled_distance = 0
 
         self.moved_to_same_place_callback = None
         self.already_have_puck_callback = None
@@ -28,7 +30,14 @@ class Robot(Entity):
             if self.moved_to_same_place_callback is not None:
                 self.moved_to_same_place_callback(self)
 
+        if self.current_in != None:
+            a = self.current_in.discrete_position[0] - interest_point.discrete_position[0]
+            b = self.current_in.discrete_position[1] - interest_point.discrete_position[1]
+            self.traveled_distance = math.sqrt((a)**2 + (b)**2)
+
         self.position = [interest_point.position[0], interest_point.position[1]]
+        self.discrete_position = interest_point.discrete_position
+
         if self.carring:
             self.carring.position = [self.position[0], self.position[1]]
         self.current_in = interest_point
@@ -98,13 +107,13 @@ class Puck(Entity):
     YELLOW = 1
     BLUE = 2
 
-    def __init__(self, pos, c, identifier):
-        super().__init__(pos, identifier)
+    def __init__(self, pos, c, identifier, discrete_pos):
+        super().__init__(pos, identifier, discrete_pos)
         self.color = c
 
 class InterestPoint(Entity):
-    def __init__(self, pos, identifier):
-        super().__init__(pos, identifier)
+    def __init__(self, pos, identifier, discrete_pos):
+        super().__init__(pos, identifier, discrete_pos)
 
         self.pucks = []
         self.is_empty_callback = None
@@ -144,18 +153,18 @@ class Machine(InterestPoint):
     YELLOW = 1
     BLUE = 2
 
-    def __init__(self, pos, color, identifier):
-        super().__init__(pos, identifier)
+    def __init__(self, pos, color, identifier, discrete_pos):
+        super().__init__(pos, identifier, discrete_pos)
 
         self.color = color
 
 class DistributionCenter(InterestPoint):
-    def __init__(self, pos, identifier):
-        super().__init__(pos, identifier)
+    def __init__(self, pos, identifier, discrete_pos):
+        super().__init__(pos, identifier, discrete_pos)
 
 class Dock(InterestPoint):
-    def __init__(self, pos, identifier):
-        super().__init__(pos, identifier)
+    def __init__(self, pos, identifier, discrete_pos):
+        super().__init__(pos, identifier, discrete_pos)
 
 
 class Map:
@@ -234,7 +243,7 @@ class GraphicsManager:
 
             # Draw texts
             if isinstance(e, InterestPoint):
-                tl = self.font.render(e.identifier, True, (0, 0, 0))
+                tl = self.font.render(e.identifier + " " + str(e.discrete_position), True, (0, 0, 0))
                 p = (e.position[0] - tl.get_rect().w/2, e.position[1] - 58)
 
             elif isinstance(e, Puck):
@@ -249,35 +258,49 @@ class GraphicsManager:
 MAP = Map()
 class Env1:
     t_reward = 0
+    total_optimal_matches = 0
     def __init__(self):
-        self.dock = Dock((65, 735), "dock")
-        self.red_machine = Machine((735, 735), Machine.RED, "red machine")
-        self.blue_machine = Machine((610, 735), Machine.BLUE, "blue machine")
-        self.yellow_machine = Machine((485, 735), Machine.YELLOW, "yellow machine")
+        self.dock = Dock((65, 735), "dock", (0, 0))
+
+        self.red_machine = Machine((735, 735),
+            Machine.RED,
+            "red machine",
+            (10, 10))
+
+        self.blue_machine = Machine((610, 735),
+            Machine.BLUE,
+            "blue machine",
+            (0, 0))
+
+        self.yellow_machine = Machine((485, 735),
+            Machine.YELLOW,
+            "yellow machine",
+            (0, 0))
+
         self.steps = 0
 
 
-        p1 = Puck((0, 0), Puck.BLUE, "blue puck 0")
+        p1 = Puck((0, 0), Puck.BLUE, "blue puck 0", (0,0))
         self.blue_machine.add_puck(p1)
-        p2 = Puck((0, 0), Puck.RED, "red puck 1")
+        p2 = Puck((0, 0), Puck.RED, "red puck 1", (0,0))
         self.red_machine.add_puck(p2)
-        p3 = Puck((0, 0), Puck.YELLOW, "yellow puck 2")
+        p3 = Puck((0, 0), Puck.YELLOW, "yellow puck 2", (0,0))
         self.yellow_machine.add_puck(p3)
 
         self.machines = [self.red_machine,
                          self.blue_machine,
                          self.yellow_machine]
 
-        self.dcs = [DistributionCenter((735, 65), "dc 1"),
-                    DistributionCenter((610, 65), "dc 2"),
-                    DistributionCenter((485, 65), "dc 3"),
-                    DistributionCenter((360, 65), "dc 4"),
-                    DistributionCenter((235, 65), "dc 5"),
-                    DistributionCenter((110, 65), "dc 6")]
+        self.dcs = [DistributionCenter((735, 65), "dc 1", (0, 0)),
+                    DistributionCenter((610, 65), "dc 2", (0, 0)),
+                    DistributionCenter((485, 65), "dc 3", (0, 0)),
+                    DistributionCenter((360, 65), "dc 4", (0, 0)),
+                    DistributionCenter((235, 65), "dc 5", (0, 0)),
+                    DistributionCenter((110, 65), "dc 6", (0, 0))]
 
         self.interest_points = [self.dock] + self.machines + self.dcs
 
-        self.robot = Robot((65, 735), "robot")
+        self.robot = Robot((65, 735), "robot", (0, 0))
         self.robot.move_to(self.dock)
 
         MAP.entities = [self.dock,
@@ -291,13 +314,13 @@ class Env1:
 
         def create_puck_callback(machine):
             if machine.color == Machine.RED:
-                p = Puck((0, 0), Puck.RED, "red puck %d" %MAP.total_pucks)
+                p = Puck((0, 0), Puck.RED, "red puck %d" %MAP.total_pucks, (0, 0))
 
             elif machine.color == Machine.BLUE:
-                p = Puck((0, 0), Puck.BLUE, "blue puck %d" %MAP.total_pucks)
+                p = Puck((0, 0), Puck.BLUE, "blue puck %d" %MAP.total_pucks, (0, 0))
 
             elif machine.color == Machine.YELLOW:
-                p = Puck((0, 0), Puck.YELLOW, "yellow puck %d" %MAP.total_pucks)
+                p = Puck((0, 0), Puck.YELLOW, "yellow puck %d" %MAP.total_pucks, (0, 0))
 
             MAP.entities.append(p)
             machine.add_puck(p)
@@ -367,12 +390,12 @@ class Env1:
             if isinstance(r.current_in, DistributionCenter):
                 Env1.t_reward = -4
 
-        self.robot.moved_to_same_place_callback = moved_to_same_place_callback
-        self.robot.already_have_puck_callback = already_have_puck_callback
-        self.robot.have_no_puck_to_pick_callback = have_no_puck_to_pick_callback
-        self.robot.have_no_puck_to_leave_callback = have_no_puck_to_leave_callback
+        # self.robot.moved_to_same_place_callback = moved_to_same_place_callback
+        # self.robot.already_have_puck_callback = already_have_puck_callback
+        # self.robot.have_no_puck_to_pick_callback = have_no_puck_to_pick_callback
+        # self.robot.have_no_puck_to_leave_callback = have_no_puck_to_leave_callback
         self.robot.left_puck_callback = left_puck_callback
-        self.robot.about_to_pick_puck_callback = about_to_pick_puck_callback
+        # self.robot.about_to_pick_puck_callback = about_to_pick_puck_callback
 
     def render(self):
         MAP.render()
@@ -435,7 +458,7 @@ class Env1:
                 state[i] = 0
 
         terminal = False
-        reward = Env1.t_reward - 0.01
+        reward = Env1.t_reward - 0.1
         if self.steps == 50:
             terminal = True
 
@@ -447,9 +470,15 @@ class Env1:
                 if (self.dcs[2].pucks[0].color == self.dcs[3].pucks[0].color) and self.dcs[2].pucks[0].color != c1:
                     c2 = self.dcs[2].pucks[0].color
                     if (self.dcs[4].pucks[0].color == self.dcs[5].pucks[0].color) and self.dcs[5].pucks[0].color != c1 and self.dcs[5].pucks[0].color != c2:
-
-                        reward = 20
                         print("Full match in %s steps" %(self.steps))
+
+                        if self.steps == 24:
+                            Env1.total_optimal_matches += 1
+                            print("Optimal match! Counting: %s" %Env1.total_optimal_matches)
+                            if Env1.total_optimal_matches == 5:
+                                exit()
+                        else:
+                            Env1.total_optimal_matches = 0
 
         Env1.t_reward = 0
 
@@ -465,6 +494,16 @@ class Env1:
             self.robot.leave_puck()
 
         self.steps += 1
+
+# if  __name__ == "__main__":
+#     e = Env1()
+#
+#     while True:
+#         e.render()
+#         a = int(input())
+#         e.act(a)
+#         print("Traveled: %s" %e.robot.traveled_distance)
+#
 
 if __name__ == "__main__":
     from tensorforce.agents import PPOAgent
@@ -523,15 +562,10 @@ if __name__ == "__main__":
         while not terminal:
             env.render()
 
-            # aind = int(input())
-            # env.act(aind)
-
-            env.act(agent.act(s, deterministic=True)) #, deterministic=True))
+            env.act(agent.act(s)) #, deterministic=True))
             terminal, r, s = env.observe()
-            time.sleep(1)
-            print("!")
-            # total_r +=r
-            # agent.observe(reward=r, terminal=terminal)
+            total_r +=r
+            agent.observe(reward=r, terminal=terminal)
 
         episodes_r.append(total_r)
 
