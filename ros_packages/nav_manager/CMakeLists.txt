@@ -8,18 +8,18 @@ project(nav_manager)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  actionlib_msgs
   message_generation
   roscpp
   rospy
   robotino_msgs 
   std_msgs
   geometry_msgs
+  actionlib
+  actionlib_msgs
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -78,6 +78,7 @@ find_package(catkin REQUIRED COMPONENTS
    DEPENDENCIES
    actionlib_msgs
    std_msgs
+   geometry_msgs
 )
 
 ################################################
