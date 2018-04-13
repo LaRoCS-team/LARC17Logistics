@@ -335,6 +335,12 @@ void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
     // Prob approach
     has_puck_ = puck_prob >= 0.5;
 
+    std::string has_puck_str;
+    if (has_puck_) has_puck_str = "true";
+    else has_puck_str = "false";
+
+    print("HasPuck: \t" + has_puck_str + "\n");
+
     // Linear approach
     /*if(distance < 0.25) {
         grabbed_puck_ = true;
@@ -367,6 +373,7 @@ void PuckInfo::spin()
         puck_info_msg.center.y = puck.second.y;
         puck_info_msg.center.z = 0;
         puck_info_msg.has_puck = has_puck_;
+//        puck_info_msg.has_puck = true;
 
         pub.publish(puck_info_msg);
         teste_pub_.publish(msg);

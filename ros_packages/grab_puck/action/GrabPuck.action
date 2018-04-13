@@ -2,6 +2,7 @@
 int32 color_id             # Specify which puck color we want to grab
 ---
 # Define the result
+# Why is the color_grabbed_puck value useful? You already know the color of the puck you're supposed to get.
 int32 color_grabbed_puck   # Color of the grabbed puck
 bool grabbed_puck          # Grabbed the puck or not (incorrect puck)
 ---

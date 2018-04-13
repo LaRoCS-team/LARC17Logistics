@@ -128,9 +128,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
+include_directories(include
         ${catkin_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -147,7 +148,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_server
         src/DeliverPuck.cpp
-        include/deliver_puck/DeliverPuck.hpp)
+        include/DeliverPuck.hpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

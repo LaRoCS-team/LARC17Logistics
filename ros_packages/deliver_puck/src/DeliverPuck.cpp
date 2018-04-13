@@ -10,7 +10,7 @@
 #include "cv_bridge/cv_bridge.h"
 #include <opencv2/highgui/highgui.hpp>
 #include "robotino_msgs/ResetOdometry.h"
-#include "../include/deliver_puck/DeliverPuck.hpp"
+#include "../include/DeliverPuck.hpp"
 
 
 using namespace std;
@@ -32,11 +32,10 @@ void DeliverPuck::print(const std::string str) {
 }
 
 DeliverPuck::DeliverPuck(std::string name) :
-        as_(n_, name, boost::bind(&DeliverPuck::executeCB, this), false),
+        as_(n_, name, boost::bind(&DeliverPuck::executeCB, this, _1), false),
         action_name_(name),
         node_loop_rate(20)
 {
-    //ROS_INFO("Instantiating DeliverPuck class");
     //Topic you want to publish
     cmd_vel_pub = n_.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
     //delivered_puck_pub = n_.advertise<std_msgs::Bool>("delivered_puck", 1000);
@@ -86,14 +85,14 @@ DeliverPuck::~DeliverPuck()
 void DeliverPuck::puckInfoCallback (const puck_info::PuckInfoMsg::ConstPtr& msg) {
     y_centroid = msg->center.y;
     has_puck_flag = msg->has_puck;
-    ROS_INFO("y_centroid = %g", y_centroid);
+//    ROS_INFO("y_centroid = %g", y_centroid);
 
 }
 
 void DeliverPuck::digitalReadingsCallback(const robotino_msgs::DigitalReadings::ConstPtr &msg) {
     //0 ta na direita
     //1 ta na esquerda
-    ROS_INFO("Inside digitalReadingsCallback");
+//    ROS_INFO("Inside digitalReadingsCallback");
     right_sensor_flag = msg->values[0];
     left_sensor_flag = msg->values[1];
 }
@@ -144,13 +143,13 @@ void DeliverPuck::calculate_slope(vector<cv::Vec4i> lines) {
 
         m = (y1 - y0)/(x1 - x0);
 
-        if (m > -.7 && m < .7) {
+        if (m > -.4 && m < .4) {
             ROS_INFO("slope of countable line = %g", m);
             mSum += m;
             count_horizontal++;
         }
 
-        if (m < -.7 || m > .7) {
+        if (m < -.4 || m > .4) {
             avg_x_pos = (x0+x1)/2;
             count_vertical++;
             ROS_INFO ("avgX = %g, slope = %g", avg_x_pos, m);
@@ -159,6 +158,7 @@ void DeliverPuck::calculate_slope(vector<cv::Vec4i> lines) {
 
     if (count_horizontal != 0) {
         avg_slope = mSum/count_horizontal;
+        ROS_INFO("mSum = %f, count_horizontal = %d, Avg slope = %f", mSum, count_horizontal, avg_slope);
     }
     else {
         ROS_INFO("No readable lines detected (|slope| > 1)!");
@@ -225,29 +225,29 @@ void DeliverPuck::align_vertical() {
 void DeliverPuck::move_to_distribution_center(vector<cv::Vec4i> lines) {
 
     cmd_vel_msg.linear.y = 0;
-    if (!no_black_line_flag) {
-        if (count_horizontal == 0) {
-            no_black_line_flag = true;
-        }
-        else {
-            cmd_vel_msg.linear.x = .1;
-        }
-
+//    if (!no_black_line_flag) {
+//        if (count_horizontal == 0) {
+//            no_black_line_flag = true;
+//        }
+//        else {
+//            cmd_vel_msg.linear.x = .1;
+//        }
+//
+//    }
+//    else {
+    if (right_sensor_flag && left_sensor_flag) {
+        cmd_vel_msg.linear.x = 0;
+        stop_flag = true;
     }
     else {
-        if (right_sensor_flag && left_sensor_flag) {
-            cmd_vel_msg.linear.x = 0;
-            stop_flag = true;
-        }
-        else {
-            cmd_vel_msg.linear.x = .1;
-        }
+        cmd_vel_msg.linear.x = .1;
     }
+ //   }
 }
 
 void DeliverPuck::finish_delivery() {
     ROS_INFO("y_centroid = %g", y_centroid);
-    if (y_centroid < CENTROID_STOP_DIST) {
+    if (y_centroid > CENTROID_STOP_DIST) {
         cmd_vel_msg.linear.x = -LINEAR_VEL;
     }
     else {
@@ -272,14 +272,15 @@ void DeliverPuck::reset_odometry() {
 
 }
 
-void DeliverPuck::executeCB() {
+void DeliverPuck::executeCB(const deliver_puck::DeliverPuckGoalConstPtr &goal) {
+    ROS_INFO("We received the goal %d", goal->action_id);
     ros::Rate lr(node_loop_rate);
-
+    ROS_INFO("We're inside executeCB");
     while (!deliver_puck_msg.data) {
         //if (state_id == DELIVER_PUCK_ID) {
         std::vector<cv::Vec4i> lines;
         HoughLinesP(image_, lines, 1, CV_PI / 180, 75, 50, 10);
-        ROS_INFO("lines = %ld", lines.size());
+//        ROS_INFO("lines = %ld", lines.size());
 
         cmd_vel_msg.angular.z = 0;
         cmd_vel_msg.linear.x = 0;
@@ -292,21 +293,26 @@ void DeliverPuck::executeCB() {
             ROS_INFO("Has puck is true");
             deliver_puck_msg.data = static_cast<unsigned char>(false);
             if (!aligned_horizontal_flag) {
+                ROS_INFO("Align horizontal is false");
                 align_horizontal();
             } else {
                 if (!aligned_vertical_flag) {
+                    ROS_INFO("Align vertical is false");
                     align_vertical();
                 } else {
                     if (!stop_flag) {
+                        ROS_INFO("Stop flag is false");
                         move_to_distribution_center(lines);
                     } else {
                         if (!first_finish_call_flag) {
+                            ROS_INFO("First finish flas is false");
 //                            reset_odometry();
-                            set_digital_readings_pub.publish(set_digital_readings_msg);
+//                            set_digital_readings_pub.publish(set_digital_readings_msg);
                             first_finish_call_flag = true;
 
                         } else {
                             if (!finished_flag) {
+                                ROS_INFO("Finished flag is false");
                                 finish_delivery();
                             } else {
                                 deliver_puck_msg.data = static_cast<unsigned char>(true);
@@ -331,71 +337,3 @@ void DeliverPuck::executeCB() {
     result_.delivered = true;
     as_.setSucceeded(result_);
 }
-
-/*
-void DeliverPuck::spin() {
-    ros::Rate lr(node_loop_rate);
-
-    while (n_.ok()) {
-        //if (state_id == DELIVER_PUCK_ID) {
-        std::vector<cv::Vec4i> lines;
-        HoughLinesP(image_, lines, 1, CV_PI/180, 75, 50, 10);
-        ROS_INFO("lines = %ld", lines.size());
-
-        cmd_vel_msg.angular.z = 0;
-        cmd_vel_msg.linear.x = 0;
-        calculate_slope(lines);
-        if (!has_puck_flag) {
-            ROS_INFO("Has puck is false");
-            //TODO:Condicao para indicar que o comportamento falhou e devemos mudá-lo
-            deliver_puck_msg.data = static_cast<unsigned char>(true);
-        }
-        else {
-            ROS_INFO("Has puck is true");
-            deliver_puck_msg.data = static_cast<unsigned char>(false);
-            if (!aligned_horizontal_flag) {
-                align_horizontal();
-            }
-            else {
-                if (!aligned_vertical_flag) {
-                    align_vertical();
-                }
-                else {
-                    if (!stop_flag) {
-                        move_to_distribution_center(lines);
-                    }
-                    else {
-                        if (!first_finish_call_flag) {
-//                            reset_odometry();
-                            set_digital_readings_pub.publish(set_digital_readings_msg);
-                            first_finish_call_flag = true;
-
-                        }
-                        else {
-                            if (!finished_flag) {
-                                finish_delivery();
-                            }
-                            else {
-                                deliver_puck_msg.data = static_cast<unsigned char>(true);
-                            }
-                        }
-
-                    }
-                }
-
-            }
-        }
-//            cmd_vel_msg.linear.y = .1;
-//            if (avgX > 280) {
-//                cmd_vel_msg.linear.y = 0;
-//            }
-        ROS_INFO("linear.x = %f, linear.y = %f", cmd_vel_msg.linear.x, cmd_vel_msg.linear.y);
-        ROS_INFO("angular.z = %f", cmd_vel_msg.angular.z);
-        cmd_vel_pub.publish(cmd_vel_msg);
-        delivered_puck_pub.publish(deliver_puck_msg);
-//        }
-        ros::spinOnce();
-        lr.sleep();
-    }
-}
-*/
