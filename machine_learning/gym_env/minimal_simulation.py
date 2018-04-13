@@ -44,6 +44,8 @@ class Robot(Entity):
         # print("- Robot moved to %s" %(self.current_in.identifier))
 
     def try_picking_puck(self):
+        self.traveled_distance = 0
+
         s = "- Robot tried to pick puck at " + self.current_in.identifier
 
         if self.carring is not None:
@@ -84,6 +86,8 @@ class Robot(Entity):
             return False
 
     def leave_puck(self):
+        self.traveled_distance = 0
+
         if self.carring is None:
             # print("- Robot tried to leave the puck, but it didn't has any")
 
@@ -257,28 +261,30 @@ class GraphicsManager:
 
 MAP = Map()
 class Env1:
+    total_traveled_distance = 0
     t_reward = 0
     total_optimal_matches = 0
-    def __init__(self):
-        self.dock = Dock((65, 735), "dock", (0, 0))
+    def __init__(self, **params):
+        Env1.total_traveled_distance = 0
+
+        self.dock = Dock((65, 735), "dock", params["dock_position"])
 
         self.red_machine = Machine((735, 735),
             Machine.RED,
             "red machine",
-            (10, 10))
+            params["red_machine_pos"])
 
         self.blue_machine = Machine((610, 735),
             Machine.BLUE,
             "blue machine",
-            (0, 0))
+            params["blue_machine_pos"])
 
         self.yellow_machine = Machine((485, 735),
             Machine.YELLOW,
             "yellow machine",
-            (0, 0))
+            params["yellow_machine_pos"])
 
         self.steps = 0
-
 
         p1 = Puck((0, 0), Puck.BLUE, "blue puck 0", (0,0))
         self.blue_machine.add_puck(p1)
@@ -291,12 +297,12 @@ class Env1:
                          self.blue_machine,
                          self.yellow_machine]
 
-        self.dcs = [DistributionCenter((735, 65), "dc 1", (0, 0)),
-                    DistributionCenter((610, 65), "dc 2", (0, 0)),
-                    DistributionCenter((485, 65), "dc 3", (0, 0)),
-                    DistributionCenter((360, 65), "dc 4", (0, 0)),
-                    DistributionCenter((235, 65), "dc 5", (0, 0)),
-                    DistributionCenter((110, 65), "dc 6", (0, 0))]
+        self.dcs = [DistributionCenter((735, 65), "dc 1", params["dc1_pos"]),
+                    DistributionCenter((610, 65), "dc 2", params["dc2_pos"]),
+                    DistributionCenter((485, 65), "dc 3", params["dc3_pos"]),
+                    DistributionCenter((360, 65), "dc 4", params["dc4_pos"]),
+                    DistributionCenter((235, 65), "dc 5", params["dc5_pos"]),
+                    DistributionCenter((110, 65), "dc 6", params["dc6_pos"])]
 
         self.interest_points = [self.dock] + self.machines + self.dcs
 
@@ -390,37 +396,39 @@ class Env1:
             if isinstance(r.current_in, DistributionCenter):
                 Env1.t_reward = -4
 
-        # self.robot.moved_to_same_place_callback = moved_to_same_place_callback
-        # self.robot.already_have_puck_callback = already_have_puck_callback
-        # self.robot.have_no_puck_to_pick_callback = have_no_puck_to_pick_callback
-        # self.robot.have_no_puck_to_leave_callback = have_no_puck_to_leave_callback
+        self.robot.moved_to_same_place_callback = moved_to_same_place_callback
+        self.robot.already_have_puck_callback = already_have_puck_callback
+        self.robot.have_no_puck_to_pick_callback = have_no_puck_to_pick_callback
+        self.robot.have_no_puck_to_leave_callback = have_no_puck_to_leave_callback
         self.robot.left_puck_callback = left_puck_callback
-        # self.robot.about_to_pick_puck_callback = about_to_pick_puck_callback
+        self.robot.about_to_pick_puck_callback = about_to_pick_puck_callback
+
+        _, _, self.initial_state = self.observe()
 
     def render(self):
         MAP.render()
 
     def observe(self):
-        state = [0,    # Holding puck (0, 1 red, 2 blue, 3 yellow)
-                 0,    # Robot at (1 - 3 machine, 4 - 10 dcs)
-                 0,    # cd 1 (0, 1 red, 2 blue, 3 yellow)
+        state =  [0]                      # Holding puck (0, 1 red, 2 blue, 3 yellow)
+        state += self.robot.discrete_position  # Robot at (1 - 3 machine, 4 - 10 dcs)
+        state+= [0,    # cd 1 (0, 1 red, 2 blue, 3 yellow)
                  0,    # cd 2 (0, 1 red, 2 blue, 3 yellow)
                  0,    # cd 3 (0, 1 red, 2 blue, 3 yellow)
                  0,    # cd 4 (0, 1 red, 2 blue, 3 yellow)
                  0,    # cd 5 (0, 1 red, 2 blue, 3 yellow)
-                 0,    # cd 6 (0, 1 red, 2 blue, 3 yellow)
-                 0, 0, # cd 0 xy
-                 0, 0,
-                 0, 0,
-                 0, 0,
-                 0, 0,
-                 0, 0,
-                 1,    # Machine 1 color
-                 2,
-                 3,
-                 0, 0, # Machine 1 xy
-                 0, 0,
-                 0, 0,]
+                 0]    # cd 6 (0, 1 red, 2 blue, 3 yellow)
+        state += self.dcs[0].discrete_position # cd 0 xy
+        state += self.dcs[1].discrete_position # cd 0 xy
+        state += self.dcs[2].discrete_position # cd 0 xy
+        state += self.dcs[3].discrete_position # cd 0 xy
+        state += self.dcs[4].discrete_position # cd 0 xy
+        state += self.dcs[5].discrete_position # cd 0 xy
+        state += [1,    # Machine 1 color
+                  2,
+                  3]
+        state += self.red_machine.discrete_position
+        state += self.blue_machine.discrete_position
+        state += self.yellow_machine.discrete_position
 
         c = self.robot.carring
         if c is not None:
@@ -434,17 +442,9 @@ class Env1:
         else:
             state[0] = 0
 
-        p = self.robot.current_in
-        if isinstance(p, Machine):
-            state[1] = 1 + self.machines.index(p)
-        elif isinstance(p, DistributionCenter):
-            state[1] = 4 + self.dcs.index(p)
-        elif isinstance(p, Dock):
-            state[1] = 0
-
         final = 0
         for dc, i in zip(self.dcs, range(0, len(self.dcs))):
-            i = i + 2
+            i = i + 3
             if dc.pucks:
                 final += 1
                 c = dc.pucks[0].color
@@ -458,7 +458,8 @@ class Env1:
                 state[i] = 0
 
         terminal = False
-        reward = Env1.t_reward - 0.1
+        reward = Env1.t_reward - self.robot.traveled_distance/100
+        Env1.total_traveled_distance += self.robot.traveled_distance
         if self.steps == 50:
             terminal = True
 
@@ -475,8 +476,8 @@ class Env1:
                         if self.steps == 24:
                             Env1.total_optimal_matches += 1
                             print("Optimal match! Counting: %s" %Env1.total_optimal_matches)
-                            if Env1.total_optimal_matches == 5:
-                                exit()
+                            # if Env1.total_optimal_matches == 5:
+                            #     exit()
                         else:
                             Env1.total_optimal_matches = 0
 
@@ -496,14 +497,25 @@ class Env1:
         self.steps += 1
 
 # if  __name__ == "__main__":
-#     e = Env1()
+#     e = Env1(red_machine_pos=    [18, 18],
+#              blue_machine_pos=   [18, 17],
+#              yellow_machine_pos= [18, 16],
+#              dock_position=      [18, 0],
+#              dc1_pos=            [0, 18],
+#              dc2_pos=            [0, 17],
+#              dc3_pos=            [0, 16],
+#              dc4_pos=            [0, 15],
+#              dc5_pos=            [0, 14],
+#              dc6_pos=            [0, 13])
 #
 #     while True:
 #         e.render()
 #         a = int(input())
 #         e.act(a)
-#         print("Traveled: %s" %e.robot.traveled_distance)
+#         t, r, s = e.observe()
 #
+#         print("Traveled: %s\nState: %s\nReward: %s" %(e.robot.traveled_distance, s, r))
+
 
 if __name__ == "__main__":
     from tensorforce.agents import PPOAgent
@@ -512,33 +524,34 @@ if __name__ == "__main__":
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
 
     agent = PPOAgent(
-        states=dict(type='float', shape=(29)), #shape=[4, 9, 4, 4, 4, 4, 4, 4]),
+        states=dict(type='float', shape=(30)), #shape=[4, 9, 4, 4, 4, 4, 4, 4]),
         actions=dict(type='int', num_actions=12),
         network=[
-            dict(type='dense', size=64),
-            dict(type='dense', size=64)
+            dict(type='dense', size=64, activation='tanh'),
+            dict(type='dense', size=64, activation='tanh'),
+            dict(type='dense', size=64, activation='tanh')
         ],
         update_mode=dict(
-            batch_size=100
+            batch_size=50
         ),
         execution=dict(
             type='single',
             session_config=tf.ConfigProto(gpu_options=gpu_options),
             distributed_spec=None
         ),
-        step_optimizer=dict(type='adam',learning_rate=1e-3),
+        step_optimizer=dict(type='adam',learning_rate=1e-4),
         baseline_mode="states",
         baseline=dict(
             type="mlp",
-            sizes=[32,32]
+            sizes=[128]
         ),
         baseline_optimizer=dict(
             type="multi_step",
             optimizer=dict(
                 type="adam",
-                learning_rate=1e-3
+                learning_rate=1e-4
             ),
-            num_steps=5
+            num_steps=10
         )
     )
 
@@ -554,27 +567,41 @@ if __name__ == "__main__":
     rt = [float(row[0]) for row in csv.reader(open("reward_history.csv"), delimiter=",")]
 
     episodes_r = []
+    episodes_d = []
     for e in range(100000):
-        env = Env1()
+        env = Env1(red_machine_pos=    [18, 18],
+                   blue_machine_pos=   [18, 17],
+                   yellow_machine_pos= [18, 16],
+                   dock_position=      [18, 0],
+                   dc1_pos=            [0, 18],
+                   dc2_pos=            [0, 17],
+                   dc3_pos=            [0, 16],
+                   dc4_pos=            [0, 15],
+                   dc5_pos=            [0, 14],
+                   dc6_pos=            [0, 13])
+
         total_r = 0
+        total_d = 0
         terminal = False
-        s = 29 * [0]
+        s = env.initial_state
         while not terminal:
             env.render()
 
             env.act(agent.act(s)) #, deterministic=True))
             terminal, r, s = env.observe()
             total_r +=r
+            total_d += env.total_traveled_distance
             agent.observe(reward=r, terminal=terminal)
 
         episodes_r.append(total_r)
+        episodes_d.append(env.total_traveled_distance)
 
-        print("Total episode reward: %s" %total_r)
+        # print("Total episode reward: %s\nTotal distance:%s\n" %(total_r, env.total_traveled_distance))
         # rt.append(total_r)
         # print("Total avg: %s" %(sum(rt)/len(rt)))
 
         if e%10 == 0:
-            print("Avg last 10: %s" %(sum(episodes_r[-10:])/10))
+            print("Avg reward (10): %s\nAvg distance: %s" %(sum(episodes_r[-10:])/10, sum(episodes_d[-10:])/10))
 
         if e%100 == 0:
             agent.save_model(directory="data/data", append_timestep=False)
@@ -583,5 +610,4 @@ if __name__ == "__main__":
         with open("reward_history.csv", "a") as csvfile:
             writer = csv.writer(csvfile)
 
-            # Marta instances, Sensors per instance, Best time
-            writer.writerow([total_r])
+            writer.writerow([total_r, total_d])
