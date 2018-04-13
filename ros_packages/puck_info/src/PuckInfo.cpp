@@ -330,10 +330,10 @@ void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
     double weight_sensors = parSigmoidFunction(-distance, 0.24, 40);
     double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 16.0/frame_.rows);
 
-    double puck_prob = weight_camera * weight_sensors;
+    double puck_prob = weight_camera + weight_sensors;
 
     // Prob approach
-    has_puck_ = puck_prob >= 0.5;
+    has_puck_ = puck_prob >= 1.0;
 
     std::string has_puck_str;
     if (has_puck_) has_puck_str = "true";
