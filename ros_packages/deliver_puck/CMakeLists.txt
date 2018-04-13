@@ -148,7 +148,7 @@ include_directories(include
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_server
         src/DeliverPuck.cpp
-        include/DeliverPuck.hpp)
+        include/deliver_puck/DeliverPuck.hpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

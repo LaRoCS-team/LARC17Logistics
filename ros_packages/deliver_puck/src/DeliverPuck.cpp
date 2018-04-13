@@ -10,7 +10,7 @@
 #include "cv_bridge/cv_bridge.h"
 #include <opencv2/highgui/highgui.hpp>
 #include "robotino_msgs/ResetOdometry.h"
-#include "../include/DeliverPuck.hpp"
+#include "../include/deliver_puck/DeliverPuck.hpp"
 
 
 using namespace std;
