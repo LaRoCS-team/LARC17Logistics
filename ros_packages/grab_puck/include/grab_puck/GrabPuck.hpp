@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
-#include <grab_puck/GrabPuckAction.h>
+#include "grab_puck/GrabPuckAction.h"
 #include <puck_info/PuckInfoMsg.h>
 
 #include "std_msgs/Bool.h"

@@ -1,4 +1,4 @@
-#include "GrabPuck.hpp"
+#include "grab_puck/GrabPuck.hpp"
 
 #include "std_msgs/String.h"
 
