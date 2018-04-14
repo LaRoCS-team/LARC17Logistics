@@ -19,13 +19,14 @@
 //client
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
+#include <nav_manager/NavManagerAction.h>
 
 class Go{
     public:
         Go(std::string name);
         void calcPose(const go_dest::GoDestGoalConstPtr &goal);
         void world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg);
-        //bool sendGoalToNav(geometry_msgs::PoseStamped pose);
+        bool sendGoalToNav(geometry_msgs::PoseStamped pose);
     private:
         float last_msg[12][3];
         geometry_msgs::Quaternion quat;
