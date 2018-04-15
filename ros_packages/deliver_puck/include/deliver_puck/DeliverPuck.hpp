@@ -86,7 +86,7 @@ private:
     cv::Mat image_;
 
     // Constants
-    float LINEAR_VEL{0.2f}, ANGULAR_VEL {-0.1f};
+    float LINEAR_VEL{0.1f}, ANGULAR_VEL {-0.1f};
     float LINE_SLOPE_THRESHOLD {0.02};
     float OBSTACLE_STOP_DIST {0.60};
 //    float CENTROID_STOP_DIST {87};
@@ -95,7 +95,7 @@ private:
     int DELIVER_PUCK_ID{13};
 
     // Private Members Functions
-    void executeCB();
+    void executeCB(const deliver_puck::DeliverPuckGoalConstPtr &goal);
 
     // Callbacks
     void visionCallback (const sensor_msgs::Image::ConstPtr& msg);
