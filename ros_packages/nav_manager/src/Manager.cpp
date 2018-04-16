@@ -43,9 +43,14 @@ void Manager::spin() {
 			
 		}
 		else {
-			
+			std::cout << "Navigation active!" << std::endl;
+			result.result = true;
+			as_.setSucceeded(result);
 		}
 
+		lr.sleep();
+		ros::spinOnce();
 	}
 
+	
 }
