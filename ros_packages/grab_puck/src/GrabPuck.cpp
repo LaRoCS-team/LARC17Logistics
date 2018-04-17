@@ -149,27 +149,6 @@ GrabPuckAction::~GrabPuckAction()
     puck_info_sub_.shutdown();
 }
 
-// void GrabPuckAction::cameraCallback(const sensor_msgs::Image_<std::allocator<void>>::ConstPtr &msg)
-// {
-//     /**
-//       * Utilizando o package cv_bridge do ROS, podemos obter um objeto do tipo Mat (OpenCV) a partir
-//       * de uma mensagem do tipo sensor_msgs/Image.
-//       *
-//       * Utilizando um ponteiro do tipo CvImageConstPtr, obtemos o objeto Mat na forma "shared", ou
-//       * seja, não faremos uma cópia dos dados, mas também não poderemos edita-los.
-//       */
-//     cv_bridge::CvImageConstPtr cv_cptr = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::BGR8);
-//     image_ = cv_cptr->image;
-//
-//     /**
-//       * O V-REP passa a imagem invertida no eixo X (horizontal), por isso, utilizando a função cv::flip()
-//       * com o parâmetro '0', fazemos um flip no eixo X.
-//       */
-//     cv::flip(image_, image_, 0);
-//
-//     // cv::imwrite("/home/previato/catkin_ws/src/visao/image.ppm", image);
-// }
-
 void GrabPuckAction::IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
 {
     /**
@@ -184,12 +163,6 @@ void GrabPuckAction::IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
     }
 }
 
-void GrabPuckAction::hasPuckCallback(const std_msgs::Bool::ConstPtr& msg)
-{
-    has_puck_flag_ = msg->data;
-    //ROS_INFO("has_puck_flag_ %d", has_puck_flag_);
-}
-
 void GrabPuckAction::puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& msg)
 {
     puck_center_X_ = msg->center.x;
@@ -201,11 +174,6 @@ void GrabPuckAction::puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& ms
     // TODO: Maybe has_puck will have another name
     //has_puck_flag_ = msg->has_puck;
     //std::cout << "Lendo a cor" << std::endl;
-}
-
-void GrabPuckAction::actionIdCallback(const std_msgs::UInt64::ConstPtr& msg)
-{
-    action_id_ = msg->data;
 }
 
 void GrabPuckAction::goToPuck()
@@ -353,61 +321,4 @@ void GrabPuckAction::forwardFlag()
 //     }
 //     //std::cout << "Antes do Tempo" << std::endl;
 //     led_msg_.stamp = ros::Time::now();
-// }
-
-// void GrabPuckAction::spin()
-// {
-//     ros::Rate lr(node_loop_rate_);
-//     while(nh_.ok())
-//     {
-//         //std::cout << "Antes do LED" << std::endl;
-//         ledPubPega(puck_color_);
-//         //std::cout << "actionID:" << action_id_ << std::endl;
-//         if (action_id_ == 14) {
-//
-//             //std::cout << "Comecou a pegar Puck" << std::endl;
-//
-//             if (!has_puck_flag_) {
-//                 got_puck_msg_.data = static_cast<unsigned char>(false);
-//
-//                 controlSpeed(0);
-//                 goToPuck();
-//                 //ROS_INFO("goToPuck()");
-//             } else {
-//                 got_puck_msg_.data = static_cast<unsigned char>(true);
-//
-//                 controlSpeed(1);
-//                 calculateFrontalDistances();
-//
-//                 // TODO: PRECISA AVALIAR ESSE VALOR
-//                 //std::cout << "Dis2: " << dist_norm_ir_5_ << "\nDis9: " << dist_norm_ir_6_ << std::endl;
-//                 if (dist_norm_ir_5_ >= 0.5 || dist_norm_ir_6_ >= 0.5) {
-//                     //std::cout << "Comecou o turn to deliver" << std::endl;
-//                     if (first_time_turn_)
-//                     {
-//                         turnToDeliverSetSide();
-//                         first_time_turn_ = false;
-//                     }
-//
-//                     turnToDeliver();
-//
-//                 } else
-//                 {
-//                     forwardStopFlag();
-//                     turnStopFlag();
-//                 }
-//             }
-//
-//             cmd_vel_msg_.linear.x = forward_flag_ * SPEED_VEL;
-//             cmd_vel_msg_.angular.z = turn_flag_ * TURN_VEL;
-//
-//             cmd_vel_pub_.publish(cmd_vel_msg_);
-//             got_puck_pub_.publish(got_puck_msg_);
-//
-//         }
-//
-//         led_pub_.publish(led_msg_);
-//         ros::spinOnce();
-//         lr.sleep();
-//     }
 // }
