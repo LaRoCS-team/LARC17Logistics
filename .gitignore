@@ -1,7 +1,1 @@
-.catkin_tools/
-build/
-devel/
-logs/
-src/
-ros_packages/deliver_puck/cmake-build-debug/
-ros_packages/grab_puck/cmake-build-debug/
+cmake-build-debug/
