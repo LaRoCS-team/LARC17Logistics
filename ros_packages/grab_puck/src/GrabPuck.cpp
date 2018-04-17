@@ -1,6 +1,7 @@
 #include "grab_puck/GrabPuck.hpp"
 
 #include "std_msgs/String.h"
+#include "grab_puck/util.hpp"
 
 using std::vector;
 
@@ -25,7 +26,7 @@ GrabPuckAction::GrabPuckAction(std::string name) :
     action_name_(name),
     turn_flag_(0),
     forward_flag_(0),
-    node_loop_rate_(20)
+    node_loop_rate_(2)
 {
     std::cout << "t1" << std::endl;
     first_time_turn_ = true;
@@ -87,20 +88,24 @@ void GrabPuckAction::spin() {
         if (!as_.isActive()) {
             print("No Goal active");
         } else {
-            //std::cout << "Comecou a pegar Puck" << std::endl;
+            print("Goal active, puck of color: " + goal_);
             if (!finished_grabbed_puck_) {
                 if (!has_puck_flag_) {
                     print("Going to Puck");
                     got_puck_msg_.data = static_cast<unsigned char>(false);
 
-                    controlSpeed(0);
                     goToPuck();
-                    //ROS_INFO("goToPuck()");
                 } else {
                     got_puck_msg_.data = static_cast<unsigned char>(true);
 
-                    controlSpeed(1);
-                    calculateFrontalDistances();
+                    //controlSpeed(1);
+                    SPEED_VEL = 0;
+                    TURN_VEL = 0;
+
+                    result_.grabbed_puck = true;
+                    as_.setSucceeded(result_);
+
+                    /*calculateFrontalDistances();
 
                     // TODO: PRECISA AVALIAR ESSE VALOR
                     std::cout << "Dis5: " << dist_norm_ir_5_ << "\nDis6: " << dist_norm_ir_6_ << std::endl;
@@ -121,11 +126,11 @@ void GrabPuckAction::spin() {
                         finished_grabbed_puck_ = true;
                         print("Delivered");
 
-                    }
+                    }*/
                 }
 
-                cmd_vel_msg_.linear.x = forward_flag_ * SPEED_VEL;
-                cmd_vel_msg_.angular.z = turn_flag_ * TURN_VEL;
+                cmd_vel_msg_.linear.x = SPEED_VEL;
+                cmd_vel_msg_.angular.z = TURN_VEL;
 
                 cmd_vel_pub_.publish(cmd_vel_msg_);
             } else {
@@ -178,24 +183,9 @@ void GrabPuckAction::puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& ms
 
 void GrabPuckAction::goToPuck()
 {
-        if (puck_center_X_ < CAMERA_WIDTH/2 - 5  || puck_center_X_ > CAMERA_WIDTH/2 + 5)
-        {
-            if (puck_center_X_ < CAMERA_WIDTH/2)
-            {
-                turnLeftFlag();
-                forwardStopFlag();
-            }
-            else if (puck_center_X_ > CAMERA_WIDTH/2)
-            {
-                turnRightFlag();
-                forwardStopFlag();
-            }
-        }
-        else
-        {
-            turnStopFlag();
-            forwardFlag();
-        }
+    SPEED_VEL = arcTgWithPar(0.9*CAMERA_HEIGHT - puck_center_Y_, 0.05, 0.025, -2.5, M_PI_2);
+    print(std::to_string(SPEED_VEL));
+    TURN_VEL = arcTgWithPar(CAMERA_WIDTH/2 - puck_center_X_, 0.15, 0.01, 0, 0);
 }
 
 double GrabPuckAction::calculateNormDistance(std::array<float, 3>& dist)
@@ -242,28 +232,23 @@ void GrabPuckAction::turnToDeliver()
     forwardStopFlag();
 }
 
+double arcTgWithPar(double x, double a, double b, double c, double d) {
+    return a * (std::atan(x * b + c) + d);
+}
+
 //TODO: VOLTAR PARA VELOCIDADES COM CHAO NO ATRICT
 void GrabPuckAction::controlSpeed(int sub_action)
 {
     if (sub_action == 0) {
-        SPEED_VEL = 0.1;
+        SPEED_VEL = arcTgWithPar(0.9*CAMERA_HEIGHT - puck_center_Y_, 0.001, 0.005, -2.5,M_PI_2);
 
-        if(puck_center_Y_ < 120)
-        {
-            TURN_VEL = 0.16;
-        } else
-        {
-            TURN_VEL = 0.08;
-        }
+        TURN_VEL = arcTgWithPar(CAMERA_WIDTH/2 - puck_center_X_, 0.02, 0.04, 0,0);
     }
-    else if (sub_action == 1)
+    else
     {
-        SPEED_VEL = 0.1;
-        TURN_VEL = 0.2;
-    }
-    else {
-        SPEED_VEL = 0.075;
-        TURN_VEL = 0.075;
+        SPEED_VEL = arcTgWithPar(0.9*CAMERA_HEIGHT - puck_center_Y_, 0.1, 0.008, -2.5,M_PI_2);
+
+        TURN_VEL = arcTgWithPar(CAMERA_WIDTH/2 - puck_center_X_, 0.1, 0.05, 0,0);
     }
 }
 
