@@ -36,6 +36,8 @@ void Go::calcPose(const go_dest::GoDestGoalConstPtr &goal){
 
     result_.sequence = this->sendGoalToNav(pose_full);
     
+    ROS_INFO("Result: %d", result_.sequence);
+
     as_.setSucceeded(result_);
 
 }
@@ -59,8 +61,8 @@ void Go::world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg
 }
 
 bool Go::sendGoalToNav(geometry_msgs::PoseStamped pose){
-    actionlib::SimpleActionClient<nav_manager::NavManagerAction> ac("manager-node", true);
-
+    actionlib::SimpleActionClient<nav_manager::NavManagerAction> ac("nav_manager", true);
+    
     ac.waitForServer(); //will wait for infinite time
     
     nav_manager::NavManagerGoal goal;
@@ -73,6 +75,6 @@ bool Go::sendGoalToNav(geometry_msgs::PoseStamped pose){
     if(success){
         success = ac.getResult()->result;
     }
-
+    
     return success;
 }
