@@ -3,7 +3,7 @@
 Go::Go(std::string name):as_(n, name, boost::bind(&Go::calcPose, this, _1), false),
     actionName(name){
     //subscribe to WorldState.
-    subWorldState = n.subscribe("world_state", 1, &Go::world_state_msg_Callback, this);
+    //subWorldState = n.subscribe("world_state", 1, &Go::world_state_msg_Callback, this);
     
     //initialize last_msg vectors.
     for(int i = 0; i < 12; i++)
