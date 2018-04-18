@@ -321,19 +321,27 @@ double parSigmoidFunction(double a, double par1, double par2) {
 void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
 {
     //cout << "Estou no callback" << endl;
-    distance_x_ = msg->points[0].x;
-    distance_y_ = msg->points[0].y;
-    distance_z_ = msg->points[0].z;
+//    distance_x_ = msg->points[0].x;
+//    distance_y_ = msg->points[0].y;
+//    distance_z_ = msg->points[0].z;
+//
+//    double distance = normDistance(distance_x_, distance_y_, distance_z_);
+//
+//    double weight_sensors = parSigmoidFunction(-distance, 0.24, 40);
+//    double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 16.0/frame_.rows);
 
-    double distance = normDistance(distance_x_, distance_y_, distance_z_);
+//    print("puck.second.y = %d, frame_.rows = %d", puck.second.y, frame_.rows);
 
-    double weight_sensors = parSigmoidFunction(-distance, 0.24, 40);
-    double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 16.0/frame_.rows);
-
-    double puck_prob = weight_camera + weight_sensors;
+//    double puck_prob = weight_camera + weight_sensors;
 
     // Prob approach
-    has_puck_ = puck_prob >= 1.0;
+//    has_puck_ = puck_prob >= 1.0;
+
+
+    //Empirical approach
+    //Simulator measures indicate that has_puck should be true when centroid_y >= 218 and 135 <= centroid_x <= 165
+    //In theory, centroid_x could be bounded between 145 and 155, but the oscillations indicate it is best to use a wider range.
+    has_puck_ = (puck.second.y >= CENTROID_Y_LOWER_BOUND && CENTROID_X_LOWER_BOUND <= puck.second.x <= CENTROID_X_UPPER_BOUND);
 
     std::string has_puck_str;
     if (has_puck_) has_puck_str = "true";
@@ -358,7 +366,7 @@ void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
     }
 
     has_puck_ = has_puck_sensor_;*/
-    //ROS_INFO("ha = %s, distancex = %f, distancey = %f, distancez = %f", ha?"true":"false", distance, distancey, distancez);
+    //print("ha = %s, distancex = %f, distancey = %f, distancez = %f", ha?"true":"false", distance, distancey, distancez);
 }
 
 

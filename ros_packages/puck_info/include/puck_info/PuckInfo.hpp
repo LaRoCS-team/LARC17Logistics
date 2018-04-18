@@ -56,6 +56,10 @@ private:
     double objMaxSize;
     pair<int, Point> puck;
 
+    int CENTROID_Y_LOWER_BOUND {218};
+    int CENTROID_X_LOWER_BOUND {135};
+    int CENTROID_X_UPPER_BOUND {165};
+
     pair<int, pair<Point, int> > detectColor(Mat frame, Mat hsv, Scalar minColor, Scalar maxColor, int colorIndex);
     Mat getTreatedInRangeHSV(Mat hsv, Scalar minColor, Scalar maxColor);
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
