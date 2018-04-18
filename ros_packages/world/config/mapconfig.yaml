@@ -23,3 +23,29 @@ Maquina6:
   x: 2.2
   y: 0.10
   phi: 90
+Numero_DCs: 6
+DC1:
+  x: 0.65
+  y: 2.15
+  phi: 0
+DC2:
+  x: 0.65
+  y: 2.15
+  phi: 0
+DC3:
+  x: 0.65
+  y: 2.15
+  phi: 0
+DC4:
+  x: 0.65
+  y: 2.15
+  phi: 0
+DC5:
+  x: 0.65
+  y: 2.15
+  phi: 0
+DC6:
+  x: 0.65
+  y: 2.15
+  phi: 0
+

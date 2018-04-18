@@ -1,4 +1,4 @@
-#include "world/WorldState.hpp"
+#include "world/MapCreator.hpp"
 #include <string>
 #include <yaml-cpp/yaml.h>
 
@@ -8,53 +8,35 @@ using namespace std;
 const float res = 0.04;
 //const int nMachines = 6, nDcs = 4;
 
-WorldState::WorldState(): map({"occup"}),loopRate(5){
+MapCreator::MapCreator(): map({"occup"}),loopRate(5){
     //Estados booleanos
     puckColor = 0;
     task = 3;
 
     //Necessary variables;
-    int i = 0;
+    int i = 0, nMachines = 0;
     float x = 0.0, y = 0.0, phi = 0.0;
-    char machi[10];
-    
-    //Path of configuration file; 
-    std::string file = "/home/tomb/catkin_ws/src/world/config/mapconfig.yaml";
+    char buffer[20]; 
 
-    //Load configuration file
-    YAML::Node conf = YAML::LoadFile(file);
+    //Get Number of Machines, from rosparam
+    ros::param::get("/Numero_maquinas", nMachines);
 
-    //Readind condiguration data;
-    int nMachines = conf["Numero_maquinas"].as<int>();
+    //Intaciate a vector of machines
     Machine m[nMachines];
 
+    //Get the position of the machines
     for (i = 1; i <= nMachines; i++) {
-	sprintf(machi, "Maquina%d", i);
-	x = conf[machi]["x"].as<float>();
-	y = conf[machi]["y"].as<float>();
-	phi = conf[machi]["phi"].as<float>();
+	sprintf(buffer, "/Maquina%d/x", i);
+	ros::param::get(buffer,x);
+	sprintf(buffer, "/Maquina%d/y", i);
+	ros::param::get(buffer,y);
+	sprintf(buffer, "/Maquina%d/phi", i);
+	ros::param::get(buffer,phi);
+
 	m[i-1].setPose(x,y,phi);
 	machines.push_back(m[i-1]);
     }
 
-
-/*
-    //Definição das máquinas: pos x, pos y, orientagoal.header = msg->header;
-    //ex: mi(float x,float y,float phi, int task, int color);
-    Machine m1(0.65,2.43,-15, task, 0);
-    Machine m2(2.15,2.50,-90, task, 0);
-    Machine m3(3.89,2.50,180, task, 0);
-    Machine m4(1.19,1.24,135, task, 0);
-    Machine m5(3.24,1.48,-135, task, 0);
-    Machine m6(2.2,0.10,90, task, 0);
-    //Add ao vetor de máquinas
-    machines.push_back(m1);
-    machines.push_back(m2);
-    machines.push_back(m3);
-    machines.push_back(m4);
-    machines.push_back(m5);
-    machines.push_back(m6);
-*/    
     //Mapa
     map.setGeometry(Length(4.0, 4.0), res);
     map.setFrameId("map");
@@ -65,7 +47,7 @@ WorldState::WorldState(): map({"occup"}),loopRate(5){
     mapPub = nh.advertise<grid_map_msgs::GridMap>("world_map", 1000, true);
 }
 
-void WorldState::PublishLoop(){
+void MapCreator::PublishLoop(){
     //Publicar tf
     ros::Time time = ros::Time::now();
     geometry_msgs::Quaternion quat = tf::createQuaternionMsgFromYaw(0);
@@ -85,7 +67,7 @@ void WorldState::PublishLoop(){
     mapPub.publish(mapMsg);
 }
 
-void WorldState::drawMap(){
+void MapCreator::drawMap(){
         grid_map::Position start;
         grid_map::Position end;
         Pose2d poseMeters;

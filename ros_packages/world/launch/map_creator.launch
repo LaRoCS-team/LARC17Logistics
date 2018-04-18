@@ -1,5 +1,8 @@
 <launch>
 
+<rosparam command="load" file="$(find
+world)/config/mapconfig.yaml" />
+
 <!-- World_State -->
 <node pkg="world" type="world_node"
 name="world_node" output="screen"/>
@@ -15,6 +18,6 @@ world)/config/world.yaml" />
 </node>
 
 <!-- Launch RViz with the demo configuration -->
-<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/world_rviz.rviz"/>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/map_creator_rviz.rviz"/>
 
 </launch>
