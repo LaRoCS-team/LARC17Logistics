@@ -23,9 +23,11 @@ public:
 
 
 private:
-		
+	float squareDistance(std::pair<float,float> point);
+
 	void distSensorsCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
 	void goalStatusCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
+		
 	void goalCB();	
 	void preemptCB();
 
