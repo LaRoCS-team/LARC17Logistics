@@ -4,6 +4,7 @@
 
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
+#include <actionlib/client/simple_action_client.h>
 #include <cmath>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -11,6 +12,7 @@
 #include <actionlib_msgs/GoalID.h>
 #include <actionlib_msgs/GoalStatusArray.h>
 #include <nav_manager/NavManagerAction.h>
+#include <navigation_fuzzy/FuzzyAction.h>
 
 using namespace std;
 
@@ -33,6 +35,7 @@ private:
 
 	ros::NodeHandle nh;
 	actionlib::SimpleActionServer<nav_manager::NavManagerAction> as_;
+	actionlib::SimpleActionClient<navigation_fuzzy::FuzzyAction> ac_;
 	ros::Subscriber dist_sensors_sub, checkGoalStatus;;
 	ros::Publisher goToGoal, cancelGoal, startFuzzy;
 
@@ -41,6 +44,7 @@ private:
 	string action_name;
 	int node_loop_rate;
 	int nav_status;
+	int fuzzyOn;	
 
 	nav_manager::NavManagerResult result;
 	nav_manager::NavManagerFeedback feedback;	

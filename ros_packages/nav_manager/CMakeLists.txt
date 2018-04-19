@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   actionlib
   actionlib_msgs
+  navigation_fuzzy
 )
 
 ## System dependencies are found with CMake's conventions

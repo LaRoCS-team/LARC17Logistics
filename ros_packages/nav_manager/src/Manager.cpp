@@ -3,14 +3,18 @@
 #include <stdlib.h>
 
 #define N_SENSORS 9 
+#define MAX_SQUARE_RADIUS_INT 40
+#define MAX_SQUARE_RADIUS_SIDES 30
 
 std::vector <std::pair<float, float>>pointsDetected(N_SENSORS);
 
 Manager::Manager(std::string name) :
 	as_(nh, name, false),
+	ac_("navigation_fuzzy", true),
 	action_name(name),
 	node_loop_rate(20),
-	nav_status(0) {
+	nav_status(0),
+	fuzzyOn(0) {
 
 	as_.registerGoalCallback(boost::bind(&Manager::goalCB, this));
 	as_.registerPreemptCallback(boost::bind(&Manager::preemptCB, this));	
@@ -26,7 +30,7 @@ Manager::Manager(std::string name) :
 }
 
 float Manager::squareDistance(std::pair<float, float> point) {
-	return (std::pow(point.first, 1) + std::pow(point.second, 2));
+	return std::sqrt(std::pow(point.first, 1) + std::pow(point.second, 2));
 }
 
 void Manager::goalStatusCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& msg) {
@@ -64,8 +68,25 @@ void Manager::spin() {
 			std::cout <<"No navigation goal active" << std::endl;	
 		}
 		else {
-			if(nav_status == 1)	//ACTIVE
+			if(nav_status == 1){	//ACTIVE
 				std::cout << "Navigation active!" << std::endl;
+				float intEsq = 100*squareDistance(pointsDetected[1]);
+				float esq = 100*squareDistance(pointsDetected[2]);
+				float dir = 100*squareDistance(pointsDetected[7]);
+        			float intDir = 100*squareDistance(pointsDetected[8]);
+				if ((intEsq > 0 && intEsq < MAX_SQUARE_RADIUS_INT) ||  (esq > 0 && esq < MAX_SQUARE_RADIUS_SIDES) || (intDir > 0 && intDir < MAX_SQUARE_RADIUS_INT) || (dir > 0 && dir < MAX_SQUARE_RADIUS_SIDES)) {  //CLOSE OBSTACLE(S)
+					actionlib_msgs::GoalID cancel;
+					cancelGoal.publish(cancel); //PREEMPTS MOVE_BASE
+					fuzzyOn = 0;
+				}
+			}
+			else if(nav_status == 2) {  //PREEMPTED
+				if(fuzzyOn == 0)
+					fuzzyOn = 1;
+				else {
+				
+				}
+			}
 			else if(nav_status == 3) { //SUCCEEDED
 				result.result = true;
 				as_.setSucceeded(result);
