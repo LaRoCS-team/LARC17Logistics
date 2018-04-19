@@ -1,0 +1,8 @@
+#goal definition
+bool order
+---
+#result definition
+bool res
+---
+#feedback
+bool feed
