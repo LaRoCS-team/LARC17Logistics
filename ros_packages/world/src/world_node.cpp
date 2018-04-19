@@ -1,10 +1,10 @@
-#include <world/WorldState.hpp>
+#include <world/State.hpp>
 
 int main(int argc, char** argv){
     ros::init(argc,argv,"world_node");
-    WorldState obj;
+    State initial;
     while(ros::ok()){
-  		obj.PublishLoop();
+  		initial.PublishLoop();
   		ros::spinOnce();
 	  }
 }
