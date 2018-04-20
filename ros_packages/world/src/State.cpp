@@ -1,28 +1,36 @@
 #include <world/State.hpp>
 
 State::State(){
-    //Path of configuration file 
-    std::string file = "/home/guicl/catkin_ws/src/world/config/mapconfig.yaml";
-    //Load configuration file
-    YAML::Node conf = YAML::LoadFile(file);
-    //Reading configuration data
-    nMachines = conf["Numero_maquinas"].as<int>();
-	nDCs = conf["Numero_DCs"].as<int>();
-	int x=0.0, y=0.0, phi=0.0;
-	char buffer[20];
-	task=1;
-    for (int i = 1; i <= nMachines; i++) {
-	sprintf(buffer, "Maquina%d", i);
-	x = conf[buffer]["x"].as<float>();
-	y = conf[buffer]["y"].as<float>();
-	phi = conf[buffer]["phi"].as<float>();
+    
+    //Necessary variables;
+    int i = 0, nMachines = 0, nDCs = 0;
+    float x = 0.0, y = 0.0, phi = 0.0;
+    char buffer[20]; 
+
+    //Get Number of Machines and DCs, from rosparam
+    ros::param::get("/Numero_maquinas", nMachines);
+    ros::param::get("/Numero_DCs", nDCs);
+
+    task=1;
+
+    //Get the position of the machines
+    for (i = 1; i <= nMachines; i++) {
+	sprintf(buffer, "/Maquina%d/x", i);
+	ros::param::get(buffer,x);
+	sprintf(buffer, "/Maquina%d/y", i);
+	ros::param::get(buffer,y);
+	sprintf(buffer, "/Maquina%d/phi", i);
+	ros::param::get(buffer,phi);
 	machines.push_back(Machine(x,y,phi,task,0));
     }
-	for (int i = 1; i <= nDCs; i++) {
-	sprintf(buffer, "DC%d", i);
-	x = conf[buffer]["x"].as<float>();
-	y = conf[buffer]["y"].as<float>();
-	phi = conf[buffer]["phi"].as<float>();
+
+    for (i = 1; i <= nDCs; i++) {
+	sprintf(buffer, "/DC%d/x", i);
+	ros::param::get(buffer,x);
+	sprintf(buffer, "/DC%d/y", i);
+	ros::param::get(buffer,y);
+	sprintf(buffer, "/DC%d/phi", i);
+	ros::param::get(buffer,phi);
 	dcs.push_back(DistrCenter(x,y,phi,task,0));
     }
 

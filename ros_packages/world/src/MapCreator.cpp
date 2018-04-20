@@ -14,25 +14,25 @@ MapCreator::MapCreator(): map({"occup"}),loopRate(5){
     task = 3;
 
     //Necessary variables;
-    int i = 0;
+    int i = 0, nMachines = 0;
     float x = 0.0, y = 0.0, phi = 0.0;
-    char machi[10];
-    
-    //Path of configuration file; 
-    std::string file = "/home/tomb/catkin_ws/src/world/config/mapconfig.yaml";
+    char buffer[20]; 
 
-    //Load configuration file
-    YAML::Node conf = YAML::LoadFile(file);
+    //Get Number of Machines, from rosparam
+    ros::param::get("/Numero_maquinas", nMachines);
 
-    //Readind condiguration data;
-    int nMachines = conf["Numero_maquinas"].as<int>();
+    //Intaciate a vector of machines
     Machine m[nMachines];
 
+    //Get the position of the machines
     for (i = 1; i <= nMachines; i++) {
-	sprintf(machi, "Maquina%d", i);
-	x = conf[machi]["x"].as<float>();
-	y = conf[machi]["y"].as<float>();
-	phi = conf[machi]["phi"].as<float>();
+	sprintf(buffer, "/Maquina%d/x", i);
+	ros::param::get(buffer,x);
+	sprintf(buffer, "/Maquina%d/y", i);
+	ros::param::get(buffer,y);
+	sprintf(buffer, "/Maquina%d/phi", i);
+	ros::param::get(buffer,phi);
+
 	m[i-1].setPose(x,y,phi);
 	machines.push_back(m[i-1]);
     }
