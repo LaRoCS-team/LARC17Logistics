@@ -1,6 +1,1 @@
 cmake-build-debug/
-src/
-devel/
-build/
-logs/
-.catkin_tools/

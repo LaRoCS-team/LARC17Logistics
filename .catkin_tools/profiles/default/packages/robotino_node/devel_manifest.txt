@@ -1,0 +1,8 @@
+ros_packages/robotino_node
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/share/robotino_node/cmake/robotino_nodeConfig.cmake /home/rafael/Documents/unicamp/robocup/festo/devel/share/robotino_node/cmake/robotino_nodeConfig.cmake
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/share/robotino_node/cmake/robotino_nodeConfig-version.cmake /home/rafael/Documents/unicamp/robocup/festo/devel/share/robotino_node/cmake/robotino_nodeConfig-version.cmake
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/lib/robotino_node/robotino_odometry_node /home/rafael/Documents/unicamp/robocup/festo/devel/lib/robotino_node/robotino_odometry_node
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/lib/robotino_node/robotino_camera_node /home/rafael/Documents/unicamp/robocup/festo/devel/lib/robotino_node/robotino_camera_node
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/lib/robotino_node/robotino_node /home/rafael/Documents/unicamp/robocup/festo/devel/lib/robotino_node/robotino_node
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/lib/robotino_node/robotino_laserrangefinder_node /home/rafael/Documents/unicamp/robocup/festo/devel/lib/robotino_node/robotino_laserrangefinder_node
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_node/lib/pkgconfig/robotino_node.pc /home/rafael/Documents/unicamp/robocup/festo/devel/lib/pkgconfig/robotino_node.pc
