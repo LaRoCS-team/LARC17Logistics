@@ -26,6 +26,7 @@ public:
 
 private:
 	float squareDistance(std::pair<float,float> point);
+	bool checkDangerSituation();	
 
 	void distSensorsCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
 	void goalStatusCallback(const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
