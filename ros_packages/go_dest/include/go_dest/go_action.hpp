@@ -10,7 +10,7 @@
 
 //msgs
 #include <std_msgs/Int64.h>
-//#include "robotino_msgs/WorldState.h"
+#include "robotino_msgs/WorldState.h"
 
 //server
 #include <actionlib/server/simple_action_server.h>
@@ -25,14 +25,14 @@ class Go{
     public:
         Go(std::string name);
         void calcPose(const go_dest::GoDestGoalConstPtr &goal);
-        //void world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg);
+        void world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg);
         bool sendGoalToNav(geometry_msgs::PoseStamped pose);
     private:
         float last_msg[12][3];
         geometry_msgs::Quaternion quat;
         geometry_msgs::PoseStamped pose_full;
         ros::NodeHandle n;
-        //ros::Subscriber subWorldState;
+        ros::Subscriber subWorldState;
         actionlib::SimpleActionServer<go_dest::GoDestAction> as_;
         go_dest::GoDestFeedback feedback_;
         go_dest::GoDestResult result_;

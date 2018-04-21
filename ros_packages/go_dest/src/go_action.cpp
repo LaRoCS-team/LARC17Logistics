@@ -3,7 +3,7 @@
 Go::Go(std::string name):as_(n, name, boost::bind(&Go::calcPose, this, _1), false),
     actionName(name){
     //subscribe to WorldState.
-    //subWorldState = n.subscribe("world_state", 1, &Go::world_state_msg_Callback, this);
+    subWorldState = n.subscribe("state", 1, &Go::world_state_msg_Callback, this);
     
     //initialize last_msg vectors.
     for(int i = 0; i < 12; i++)
@@ -41,7 +41,7 @@ void Go::calcPose(const go_dest::GoDestGoalConstPtr &goal){
     as_.setSucceeded(result_);
 
 }
-/*
+
 void Go::world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg){
     int i;
 
@@ -58,7 +58,7 @@ void Go::world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg
             last_msg[i][2] = msg->dcs[i - 6].goalPose.theta;
         }
     }
-}*/
+}
 
 bool Go::sendGoalToNav(geometry_msgs::PoseStamped pose){
     actionlib::SimpleActionClient<nav_manager::NavManagerAction> ac("nav_manager", true);
