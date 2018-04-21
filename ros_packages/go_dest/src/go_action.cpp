@@ -42,7 +42,7 @@ void Go::calcPose(const go_dest::GoDestGoalConstPtr &goal){
 
 }
 
-void Go::world_state_msg_Callback(const robotino_msgs::WorldState::ConstPtr& msg){
+void Go::world_state_msg_Callback(const world::State::ConstPtr& msg){
     int i;
 
     //get the current poses from the WorldState.
