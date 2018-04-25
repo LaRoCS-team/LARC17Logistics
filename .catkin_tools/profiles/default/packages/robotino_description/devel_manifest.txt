@@ -1,4 +1,0 @@
-ros_packages/robotino_description
-/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_description/share/robotino_description/cmake/robotino_descriptionConfig.cmake /home/rafael/Documents/unicamp/robocup/festo/devel/share/robotino_description/cmake/robotino_descriptionConfig.cmake
-/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_description/share/robotino_description/cmake/robotino_descriptionConfig-version.cmake /home/rafael/Documents/unicamp/robocup/festo/devel/share/robotino_description/cmake/robotino_descriptionConfig-version.cmake
-/home/rafael/Documents/unicamp/robocup/festo/devel/.private/robotino_description/lib/pkgconfig/robotino_description.pc /home/rafael/Documents/unicamp/robocup/festo/devel/lib/pkgconfig/robotino_description.pc
