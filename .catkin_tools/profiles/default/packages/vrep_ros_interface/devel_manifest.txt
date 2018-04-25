@@ -1,0 +1,5 @@
+ros_packages/vrep_ros_interface
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/vrep_ros_interface/share/vrep_ros_interface/cmake/vrep_ros_interfaceConfig-version.cmake /home/rafael/Documents/unicamp/robocup/festo/devel/share/vrep_ros_interface/cmake/vrep_ros_interfaceConfig-version.cmake
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/vrep_ros_interface/share/vrep_ros_interface/cmake/vrep_ros_interfaceConfig.cmake /home/rafael/Documents/unicamp/robocup/festo/devel/share/vrep_ros_interface/cmake/vrep_ros_interfaceConfig.cmake
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/vrep_ros_interface/lib/libv_repExtRosInterface.so /home/rafael/Documents/unicamp/robocup/festo/devel/lib/libv_repExtRosInterface.so
+/home/rafael/Documents/unicamp/robocup/festo/devel/.private/vrep_ros_interface/lib/pkgconfig/vrep_ros_interface.pc /home/rafael/Documents/unicamp/robocup/festo/devel/lib/pkgconfig/vrep_ros_interface.pc

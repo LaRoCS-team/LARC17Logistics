@@ -65,7 +65,7 @@ private:
     bool aligned_vertical_flag;
     bool stop_flag;
     bool finished_flag;
-    bool has_puck_flag;
+    bool has_puck;
     bool right_sensor_flag;
     bool no_black_line_flag;
     bool left_sensor_flag;
@@ -90,7 +90,7 @@ private:
     float LINE_SLOPE_THRESHOLD {0.02};
     float OBSTACLE_STOP_DIST {0.60};
 //    float CENTROID_STOP_DIST {87};
-    float CENTROID_STOP_DIST {60};
+    int CENTROID_STOP_DIST {160};
 //    float NO_IR_READING_DIST{0.55};
     int DELIVER_PUCK_ID{13};
 
@@ -114,7 +114,7 @@ private:
     void finish_delivery();
     void reset_odometry();
 
-    void print(const std::string str);
+    void print(const char *str, ...);
 
 };
 
