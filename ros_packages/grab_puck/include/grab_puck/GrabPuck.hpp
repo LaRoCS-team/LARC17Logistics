@@ -15,14 +15,11 @@
 
 class GrabPuckAction {
 private:
+    // ROS Handle, ActionLib Server, Publishers, Subscribers and Messages and Results
     ros::NodeHandle nh_;
+
     actionlib::SimpleActionServer<grab_puck::GrabPuckAction> as_;
-
     std::string action_name_;
-
-    grab_puck::GrabPuckResult result_;
-
-    // ROS Handles, Publishers, Subscriber and Messages
 
     ros::Publisher cmd_vel_pub_;
 
@@ -30,60 +27,60 @@ private:
     ros::Subscriber puck_info_sub_;
 
     geometry_msgs::Twist cmd_vel_msg_;
-    std_msgs::Bool got_puck_msg_;
     //robotino_msgs::DigitalReadings led_msg_;
 
-    // Parameters
-    double puck_center_X_, puck_center_Y_;
-    int turn_flag_, forward_flag_;
-    bool has_puck_flag_, first_time_turn_;
+    grab_puck::GrabPuckResult result_;
+
+    // ROS Parameters
+    bool debug_mode_;
+
+    // ROS spin loop rate
     int node_loop_rate_;
-    long puck_color_;
-    unsigned long action_id_;
-    std::array<std::array<float, 3>, 9> dist_ir_;
+
+    // ActionLib goal variables
+    int goal_;
+
+    // Grab Puck Flags
+    bool first_time_turn_, finished_grabbed_puck_;
     int side_turn_flag_;
+
+    // Puck info informations
+    double puck_center_X_, puck_center_Y_;
+    bool has_puck_;
+    int puck_color_;
+
+    // IR sensors readings
+    std::array<std::array<float, 3>, 9> dist_ir_;
+
     // Frontal euclidean norm distances
-    double dist_norm_ir_2_, dist_norm_ir_3_, dist_norm_ir_8_, dist_norm_ir_9_;
-    double dist_norm_ir_5_, dist_norm_ir_6_;
+    std::array<double, 9> dist_norm_ir_;
+
     // Constants
     double CAMERA_WIDTH {320}, CAMERA_HEIGHT {240};
     double SPEED_VEL {0}, TURN_VEL {0};
-    float PUCK_DISTANCE_REDUCE_VEL {0.3};
-    bool debug_mode_;
 
-    int goal_;
 
-    bool finished_grabbed_puck_;
-
-    // Private Members Functions
-    // Callbacks
-    // void cameraCallback(const sensor_msgs::Image::ConstPtr& msg);
+    // Pub/Sub Callbacks
     void IRCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
-    void hasPuckCallback(const std_msgs::Bool::ConstPtr& msg);
     void puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& msg);
-    void actionIdCallback(const std_msgs::UInt64::ConstPtr& msg);
-    // Movement flags setters
-    void turnLeftFlag();
-    void turnRightFlag();
-    void turnStopFlag();
-    void forwardFlag();
-    void forwardStopFlag();
-    void controlSpeed(int sub_action);
 
-    // Go and take puck functions
-    void goToPuck();
-    void turnToDeliver();
-
-    // Auxiliary calc functions
-    double calculateNormDistance(std::array<float, 3> &dist);
-    void calculateFrontalDistances();
-
-    void ledPubPega(int color);
-
-    void turnToDeliverSetSide();
-    void print(const std::string str);
+    // ActionLib Callbacks
     void goalCB();
     void preemptCB();
+
+    // Reseting functions
+    void resetFlags();
+
+    // Grab puck functions, go to the puck, turn to deliver and stop deliver
+    void goToPuck();
+    void turnToDeliver();
+    void stopDeliver();
+
+    // Aux grab puck functions
+    void turnToDeliverSetSide();
+    double calculateNormDistance(std::array<float, 3> &dist);
+    void calculateFrontalDistances();
+    void print(std::string str);
 
 public:
     explicit GrabPuckAction(std::string name);
