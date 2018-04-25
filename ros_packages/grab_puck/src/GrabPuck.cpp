@@ -40,13 +40,10 @@ GrabPuckAction::GrabPuckAction(std::string name) :
 
     // Initialize Publishers
     cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 100);
-    // led_pub_ = nh_.advertise<robotino_msgs::DigitalReadings>("set_digital_values", 100);
 
     // Initialize Subscribers
     distance_sensors_sub_ = nh_.subscribe("distance_sensors", 100, &GrabPuckAction::IRCallback, this);
-    // has_puck_sub_ = nh_.subscribe("hasPuck", 100, &GrabPuckAction::hasPuckCallback, this);
     puck_info_sub_ = nh_.subscribe("puck_info", 100, &GrabPuckAction::puckInfoCallback, this);
-    // action_id_sub_ = nh_.subscribe("action_id", 100, &GrabPuckAction::actionIdCallback, this);
 
     // ActionLib Callbacks
     as_.registerGoalCallback(boost::bind(&GrabPuckAction::goalCB, this));
@@ -76,8 +73,6 @@ void GrabPuckAction::spin() {
     ros::Rate lr(node_loop_rate_);
 
     while (nh_.ok()) {
-        //ledPubPega(puck_color_);
-
         if (!as_.isActive()) {
             print("No Goal active");
         } else {
@@ -95,7 +90,6 @@ void GrabPuckAction::spin() {
 
                     goToPuck();
                 } else {
-                    //controlSpeed(1);
                     SPEED_VEL = 0;
                     TURN_VEL = 0;
 
