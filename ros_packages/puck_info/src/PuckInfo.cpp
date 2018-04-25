@@ -330,7 +330,8 @@ void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
 //    double weight_sensors = parSigmoidFunction(-distance, 0.24, 40);
 //    double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 16.0/frame_.rows);
 
-//    print("puck.second.y = %d, frame_.rows = %d", puck.second.y, frame_.rows);
+    double weight_sensors = parSigmoidFunction(-distance, 0.22, 40);
+    double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 8.0/frame_.rows);
 
 //    double puck_prob = weight_camera + weight_sensors;
 

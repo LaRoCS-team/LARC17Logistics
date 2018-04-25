@@ -1,0 +1,8 @@
+# Define the goal
+geometry_msgs/PoseStamped destination
+---
+# Define the result
+bool result
+---
+# Define a feedback message
+int32 status
