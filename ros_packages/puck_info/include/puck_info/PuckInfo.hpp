@@ -68,8 +68,6 @@ private:
 
     NodeHandle node;
     Publisher pub;
-    Subscriber camSub;
-    Subscriber sensor_sub_;
 
     Rate loopRate;
     image_transport::Subscriber imgSub;
@@ -81,9 +79,9 @@ private:
 
     cv::Mat frame_;
 
-
-    void sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
     void print(const std::string str);
+
+    void checkPuck();
 };
 
 
