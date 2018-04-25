@@ -76,7 +76,7 @@ void GrabPuckAction::spin() {
         if (!as_.isActive()) {
             print("No Goal active");
         } else {
-            print("Goal active, grab puck of color: " + goal_);
+            print("Goal active, grab puck of color: " + std::to_string(goal_));
 
             if (puck_color_ != goal_) {
                 print("Puck color does not match goal color");
@@ -92,9 +92,6 @@ void GrabPuckAction::spin() {
                 } else {
                     SPEED_VEL = 0;
                     TURN_VEL = 0;
-
-                    result_.grabbed_puck = static_cast<unsigned char>(true);
-                    as_.setSucceeded(result_);
 
                     calculateFrontalDistances();
 
@@ -161,6 +158,7 @@ void GrabPuckAction::puckInfoCallback(const puck_info::PuckInfoMsg::ConstPtr& ms
     puck_center_Y_ = msg->center.y;
     puck_color_ = msg->color;
     has_puck_ = msg->has_puck;
+    print("Has puck: " + std::to_string(has_puck_));
 }
 
 void GrabPuckAction::goToPuck()

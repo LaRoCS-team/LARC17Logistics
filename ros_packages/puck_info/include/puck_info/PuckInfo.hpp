@@ -56,7 +56,7 @@ private:
     double objMaxSize;
     pair<int, Point> puck;
 
-    int CENTROID_Y_LOWER_BOUND {218};
+    int CENTROID_Y_LOWER_BOUND {200};
     int CENTROID_X_LOWER_BOUND {135};
     int CENTROID_X_UPPER_BOUND {165};
 
