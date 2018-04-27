@@ -103,8 +103,8 @@ void DeliverPuck::puckInfoCallback (const puck_info::PuckInfoMsg::ConstPtr& msg)
 
 void DeliverPuck::digitalReadingsCallback(const robotino_msgs::DigitalReadings::ConstPtr &msg) {
     //0 - right_sensor, 1 - left_sensor
-    right_sensor_flag = !(msg->values[0]);
-    left_sensor_flag = !(msg->values[1]);
+    right_sensor_flag = msg->values[0];
+    left_sensor_flag = msg->values[1];
 }
 
 void DeliverPuck::actionIdCallback (const std_msgs::UInt64::ConstPtr& msg) {
@@ -190,11 +190,11 @@ void DeliverPuck::align_horizontal() {
     if (avg_slope < -LINE_SLOPE_THRESHOLD || avg_slope > LINE_SLOPE_THRESHOLD) {
         if (avg_slope < 0) {
             print("Estamos na condicao avg slope < 0\n");
-            cmd_vel_msg.angular.z = -ANGULAR_VEL;
+            cmd_vel_msg.angular.z = ANGULAR_VEL;
         }
         else {
             print("Estamos na condicao avg slope > 0\n");
-            cmd_vel_msg.angular.z = ANGULAR_VEL;
+            cmd_vel_msg.angular.z = -ANGULAR_VEL;
         }
     }
     else {
@@ -240,6 +240,7 @@ void DeliverPuck::align_vertical() {
 
         } else {
             aligned_vertical_flag = true;
+            exit(1);
         }
     }
 }
