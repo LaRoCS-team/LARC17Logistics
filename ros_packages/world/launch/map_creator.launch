@@ -1,0 +1,23 @@
+<launch>
+
+<rosparam command="load" file="$(find
+world)/config/mapconfig.yaml" />
+
+<!-- World_State -->
+<node pkg="world" type="map_creator_node"
+name="map_creator_node" output="screen"/>
+
+<!-- Converte para occupancy/grid -->
+
+<node pkg="grid_map_visualization"
+type="grid_map_visualization"
+name="grid_map_visualization" output="screen">
+<rosparam command="load" file="$(find
+world)/config/world.yaml" />
+<remap from="grid_map_visualization/traversability_grid" to="map" />
+</node>
+
+<!-- Launch RViz with the demo configuration -->
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/map_creator_rviz.rviz"/>
+
+</launch>
