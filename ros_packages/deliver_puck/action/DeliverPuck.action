@@ -1,5 +1,5 @@
 # Define the goal
-# No goal defined
+int32 action_id
 ---
 # Define the result
 bool delivered          # Delivered the puck or not (could not deliver)

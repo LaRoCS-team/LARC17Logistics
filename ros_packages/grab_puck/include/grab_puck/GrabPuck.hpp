@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
-#include <grab_puck/GrabPuckAction.h>
+#include "grab_puck/GrabPuckAction.h"
 #include <puck_info/PuckInfoMsg.h>
 
 #include "std_msgs/Bool.h"
@@ -46,8 +46,8 @@ private:
     double dist_norm_ir_2_, dist_norm_ir_3_, dist_norm_ir_8_, dist_norm_ir_9_;
     double dist_norm_ir_5_, dist_norm_ir_6_;
     // Constants
-    int CAMERA_WIDTH {320}, CAMERA_HEIGHT {240};
-    float SPEED_VEL {0}, TURN_VEL {0};
+    double CAMERA_WIDTH {320}, CAMERA_HEIGHT {240};
+    double SPEED_VEL {0}, TURN_VEL {0};
     float PUCK_DISTANCE_REDUCE_VEL {0.3};
     bool debug_mode_;
 
