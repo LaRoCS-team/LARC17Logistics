@@ -36,7 +36,7 @@ private:
 	void goalCB();
 	void preemptCB();
 
-	void doneNav(const actionlib::SimpleClientGoalState& state, const MoveBaseResultConstPtr& result);
+	void doneNav(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result);
 	void activeNav();
   void feedbackCB(const move_base_msgs::MoveBaseFeedbackConstPtr &feedback);
 
@@ -54,6 +54,8 @@ private:
 	int node_loop_rate;
 	int nav_status;
 	int fuzzyOn;
+
+	bool nav_done;
 
 	nav_manager::NavManagerResult result;
 	nav_manager::NavManagerFeedback feedback;

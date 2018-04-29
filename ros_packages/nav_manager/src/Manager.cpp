@@ -1,6 +1,7 @@
 #include "nav_manager/Manager.hpp"
 #include <array>
-#include <stdlib.h>
+#include <iostream>
+#include <cmath>
 
 #define N_SENSORS 9
 #define MAX_SQUARE_RADIUS_INT 40
@@ -28,7 +29,7 @@ Manager::Manager(std::string name) :
 	startFuzzy = nh.advertise<std_msgs::Bool>("response", 1);
 
 	dist_sensors_sub = nh.subscribe("distance_sensors", 1, &Manager::distSensorsCallback, this);
-	checkGoalStatus = nh.subscribe("move_base/status", 1, &Manager::goalStatusCallback, this);
+	//checkGoalStatus = nh.subscribe("move_base/status", 1, &Manager::goalStatusCallback, this);
 
 
 	as_.start();
@@ -63,15 +64,18 @@ void Manager::distSensorsCallback(const sensor_msgs::PointCloud::ConstPtr& msg) 
 	}
 }
 
-void feedbackCB(const move_base_msgs::MoveBaseFeedbackConstPtr &feedback) {
+void Manager::feedbackCB(const move_base_msgs::MoveBaseFeedbackConstPtr &feedback) {
 
 }
 
-void doneNav(const actionlib::SimpleClientGoalState& state, const MoveBaseResultConstPtr& result) {
-
+void Manager::doneNav(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result) {
+	nav_done = state.isDone();
+	if (nav_done) {
+		nav_status = ac_.getState().state_;
+	}
 }
 
-void activeNav() {
+void Manager::activeNav() {
 
 }
 
@@ -91,7 +95,7 @@ void Manager::goalCB() {
 	goal.target_pose.header.stamp = ros::Time::now();
 	moveBaseClient.waitForServer();
 	//moveBaseClient.sendGoal(goal, feedback_cb=);
-	moveBaseClient.sendGoal(goal, boost::bind(&doneNav, this, _1, _2), boost::bind(&activeNav, this), boost::bind(&feedbackCB, this, _1));
+	moveBaseClient.sendGoal(goal, boost::bind(&Manager::doneNav, this, _1, _2), boost::bind(&Manager::activeNav, this), boost::bind(&Manager::feedbackCB, this, _1));
 }
 
 void Manager::spin() {
@@ -102,91 +106,90 @@ void Manager::spin() {
 				}
 				else {
 					//goal was sent
-						if(ac_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
-								result.result = true;
-								as_.setSucceeded(result);
-						}
-						if(checkDangerSituation()) {
-								moveBaseClient.cancelAllGoals();
-								moveBaseClient.stopTrackingGoal();
-								cout << "cancelou rota" << endl;
-								ac_.waitForServer();
-								navigation_fuzzy::FuzzyGoal fuzzyOn;
-								fuzzyOn.order = true;
-								ac_.sendGoal(fuzzyOn);
-								bool success = ac_.waitForResult(ros::Duration(60.0));
-								if(success == true) { //REACTIVATES NAVIGATION
-										bool res = ac_.getResult()->res;
-										if(res == true) {
-											//goToGoal.publish(goal);
-												//goal.target_pose.header= goal_go_dest.header;
-												//goal.target_pose.pose = goal_go_dest.pose;
-												goal.target_pose.header.stamp = ros::Time::now();
-												moveBaseClient.waitForServer();
-												moveBaseClient.sendGoal(goal);
-										}
+				/*if(ac_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
+						result.result = true;
+						as_.setSucceeded(result);
+				}
+				if(checkDangerSituation()) {
+						moveBaseClient.cancelAllGoals();
+						moveBaseClient.stopTrackingGoal();
+						cout << "cancelou rota" << endl;
+						ac_.waitForServer();
+						navigation_fuzzy::FuzzyGoal fuzzyOn;
+						fuzzyOn.order = true;
+						ac_.sendGoal(fuzzyOn);
+						bool success = ac_.waitForResult(ros::Duration(60.0));
+						if(success == true) { //REACTIVATES NAVIGATION
+								bool res = ac_.getResult()->res;
+								if(res == true) {
+									//goToGoal.publish(goal);
+										//goal.target_pose.header= goal_go_dest.header;
+										//goal.target_pose.pose = goal_go_dest.pose;
+										goal.target_pose.header.stamp = ros::Time::now();
+										moveBaseClient.waitForServer();
+										moveBaseClient.sendGoal(goal);
 								}
-								else {
-										result.result = false;
-										as_.setSucceeded(result);
-								}
-						}
-				}
-			/*if(nav_status == 1){	//ACTIVE
-				std::cout << "Navigation active!" << std::endl;
-				if(checkDangerSituation()){  //CLOSE OBSTACLE(S)
-					moveBaseClient.cancelAllGoals();
-					moveBaseClient.stopTrackingGoal();
-					cout << "cancelou rota" << endl;
-					//actionlib_msgs::GoalID cancel;
-					//cancelGoal.publish(cancel); //PREEMPTS MOVE_BASE
-					fuzzyOn = 0;
-				}
-			}
-
-			else if(nav_status == 2) {  //PREEMPTED
-				cout << "Navigation is preempted" << endl;
-				if(fuzzyOn == 0) {
-					//cout << "Fuzzy to be turned on" << endl;
-					ac_.waitForServer();
-					navigation_fuzzy::FuzzyGoal goal;
-					goal.order = true;
-					ac_.sendGoal(goal);
-					fuzzyOn = 1;
-				}
-				else if(fuzzyOn == 1){
-					cout << "Fuzzy on" << endl;
-					bool success = ac_.waitForResult(ros::Duration(60.0));
-					if(success == true) { //REACTIVATES NAVIGATION
-						bool res = ac_.getResult()->res;
-						if(res == true) {
-							//goToGoal.publish(goal);
-							moveBaseClient.waitForServer();
-							moveBaseClient.sendGoal(goal);
-							fuzzyOn = -1;
 						}
 						else {
-							result.result = false;
-							as_.setSucceeded(result);
+								result.result = false;
+								as_.setSucceeded(result);
+						}
+				}
+		}*/
+					if(nav_status == 1){	//ACTIVE
+						std::cout << "Navigation active!" << std::endl;
+						if(checkDangerSituation()){  //CLOSE OBSTACLE(S)
+							moveBaseClient.cancelAllGoals();
+							moveBaseClient.stopTrackingGoal();
+							cout << "cancelou rota" << endl;
+							//actionlib_msgs::GoalID cancel;
+							//cancelGoal.publish(cancel); //PREEMPTS MOVE_BASE
+							fuzzyOn = 0;
 						}
 					}
-					else { //ROBOT STUCK, FUZZY COULD NOT HANDLE
-						//cout << "fuzzy failed for some reason";
+
+					else if(nav_status == 2) {  //PREEMPTED
+						cout << "Navigation is preempted" << endl;
+						if(fuzzyOn == 0) {
+							//cout << "Fuzzy to be turned on" << endl;
+							ac_.waitForServer();
+							navigation_fuzzy::FuzzyGoal goal;
+							goal.order = true;
+							ac_.sendGoal(goal);
+							fuzzyOn = 1;
+						}
+						else if(fuzzyOn == 1){
+							cout << "Fuzzy on" << endl;
+							bool success = ac_.waitForResult(ros::Duration(60.0));
+							if(success == true) { //REACTIVATES NAVIGATION
+								bool res = ac_.getResult()->res;
+								if(res == true) {
+									//goToGoal.publish(goal);
+									moveBaseClient.waitForServer();
+									moveBaseClient.sendGoal(goal);
+									fuzzyOn = -1;
+								}
+								else {
+									result.result = false;
+									as_.setSucceeded(result);
+								}
+							}
+							else { //ROBOT STUCK, FUZZY COULD NOT HANDLE
+								//cout << "fuzzy failed for some reason";
+								result.result = false;
+								as_.setSucceeded(result);
+							}
+						}
+					}
+					else if(nav_status == 3) { //SUCCEEDED
+						result.result = true;
+						as_.setSucceeded(result);
+					}
+					else if(nav_status == 4) { //ABORTED
 						result.result = false;
 						as_.setSucceeded(result);
 					}
 				}
-			}
-			else if(nav_status == 3) { //SUCCEEDED
-				result.result = true;
-				as_.setSucceeded(result);
-			}
-			else if(nav_status == 4) { //ABORTED
-				result.result = false;
-				as_.setSucceeded(result);
-			}
-		}
-		*/
 		lr.sleep();
 		ros::spinOnce();
 	}
