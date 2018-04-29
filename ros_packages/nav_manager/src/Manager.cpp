@@ -70,8 +70,8 @@ void Manager::feedbackCB(const move_base_msgs::MoveBaseFeedbackConstPtr &feedbac
 
 void Manager::doneNav(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseResultConstPtr& result) {
 	nav_done = state.isDone();
-	if (nav_done) {
-		nav_status = ac_.getState().state_;
+	if (!nav_done) {
+		nav_status = state.state_;
 	}
 }
 
