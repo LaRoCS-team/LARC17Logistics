@@ -4,8 +4,6 @@ project(navigation_fuzzy)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-set(fuzzylite /home/previato/programs/fuzzylite-6.0)
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -126,14 +124,14 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS} #${Boost_INCLUDE_DIRS}
   #"${FUZZY_PATH}"
-     ${fuzzylite}/release/bin
-     ${fuzzylite}/fuzzylite
+  $ENV{FUZZY_PATH}/release/bin
+  $ENV{FUZZY_PATH}/fuzzylite
 )
 
 
 link_directories(
-   ${fuzzylite}/release/bin
-   ${fuzzylite}/fuzzylite
+   $ENV{FUZZY_PATH}/release/bin
+   $ENV{FUZZY_PATH}/fuzzylite
 )
 
 
