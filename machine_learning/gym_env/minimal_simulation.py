@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+import pygame, math, itertools
+=======
 import pygame, math
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
 class Entity:
     def __init__(self, pos, identifier, discrete_pos):
@@ -58,6 +62,10 @@ class Robot(Entity):
 
             return False
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
         if not (isinstance(self.current_in, Machine) or isinstance(self.current_in, DistributionCenter)):
             s += ", but it wasn't at a machine or a dc"
 
@@ -184,6 +192,10 @@ class Map:
 
     def render(self):
         self.__graphics_manager.render(self.entities)
+<<<<<<< HEAD
+        pass
+=======
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
 class GraphicsManager:
     screen = None
@@ -357,11 +369,19 @@ class Env1:
 
         def left_puck_callback(r):
             dc = r.current_in
+<<<<<<< HEAD
+            # Env1.t1t_reward = 0
+
+            if isinstance(r.current_in, Machine) or isinstance(r.current_in, Dock):
+                # Reward for leaving the puck on the wrong place (machine or dock)
+                Env1.t_reward = 0
+=======
             Env1.t1t_reward = 0
 
             if isinstance(r.current_in, Machine) or isinstance(r.current_in, Dock):
                 # Reward for leaving the puck on the wrong place (machine or dock)
                 Env1.t1t_reward = -2
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
             elif len(r.current_in.pucks) == 1 and self.ever_received_puck[self.dcs.index(dc)] == 0:
                 self.ever_received_puck[self.dcs.index(dc)] = 1
@@ -403,7 +423,11 @@ class Env1:
         self.robot.left_puck_callback = left_puck_callback
         self.robot.about_to_pick_puck_callback = about_to_pick_puck_callback
 
+<<<<<<< HEAD
+        _, _, self.initial_state, _ = self.observe()
+=======
         _, _, self.initial_state = self.observe()
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
     def render(self):
         MAP.render()
@@ -458,11 +482,20 @@ class Env1:
                 state[i] = 0
 
         terminal = False
+<<<<<<< HEAD
+
+        reward = Env1.t_reward - self.robot.traveled_distance/1000
+=======
         reward = Env1.t_reward - self.robot.traveled_distance/100
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
         Env1.total_traveled_distance += self.robot.traveled_distance
         if self.steps == 50:
             terminal = True
 
+<<<<<<< HEAD
+        all_finished = False
+=======
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
         if final == 6 or self.steps == 60:
             terminal = True
 
@@ -476,14 +509,23 @@ class Env1:
                         if self.steps == 24:
                             Env1.total_optimal_matches += 1
                             print("Optimal match! Counting: %s" %Env1.total_optimal_matches)
+<<<<<<< HEAD
+                            if Env1.total_optimal_matches == 20:
+                                all_finished = True
+=======
                             # if Env1.total_optimal_matches == 5:
                             #     exit()
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
                         else:
                             Env1.total_optimal_matches = 0
 
         Env1.t_reward = 0
 
+<<<<<<< HEAD
+        return (terminal, reward, state, all_finished)
+=======
         return (terminal, reward, state)
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
 
     def act(self, action_id):
@@ -529,6 +571,10 @@ if __name__ == "__main__":
         network=[
             dict(type='dense', size=64, activation='tanh'),
             dict(type='dense', size=64, activation='tanh'),
+<<<<<<< HEAD
+            dict(type='dense', size=64, activation='tanh'),
+=======
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
             dict(type='dense', size=64, activation='tanh')
         ],
         update_mode=dict(
@@ -543,7 +589,11 @@ if __name__ == "__main__":
         baseline_mode="states",
         baseline=dict(
             type="mlp",
+<<<<<<< HEAD
+            sizes=[128, 128]
+=======
             sizes=[128]
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
         ),
         baseline_optimizer=dict(
             type="multi_step",
@@ -562,13 +612,38 @@ if __name__ == "__main__":
     except:
         print("Couldn't load data")
 
+<<<<<<< HEAD
+    import time, numpy, csv
+    from random import randint
+=======
     import random, time, numpy, csv
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
     rt = [float(row[0]) for row in csv.reader(open("reward_history.csv"), delimiter=",")]
 
     episodes_r = []
     episodes_d = []
+<<<<<<< HEAD
+    for e in range(1000000):
+        # print("New configuration")
+        # point_cloud = list(itertools.permutations(range(0, 19), 2))
+        #
+        # points = [point_cloud.pop(randint(0, len(point_cloud) - 1)) for _ in range(10)]
+        #
+        # env = Env1(red_machine_pos=    points.pop(randint(0, len(points) - 1)),
+        #            blue_machine_pos=   points.pop(randint(0, len(points) - 1)),
+        #            yellow_machine_pos= points.pop(randint(0, len(points) - 1)),
+        #            dock_position=      points.pop(randint(0, len(points) - 1)),
+        #            dc1_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc2_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc3_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc4_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc5_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc6_pos=            points.pop(randint(0, len(points) - 1)))
+
+=======
     for e in range(100000):
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
         env = Env1(red_machine_pos=    [18, 18],
                    blue_machine_pos=   [18, 17],
                    yellow_machine_pos= [18, 16],
@@ -587,11 +662,20 @@ if __name__ == "__main__":
         while not terminal:
             env.render()
 
+<<<<<<< HEAD
+            env.act(agent.act(s, deterministic=True))
+            terminal, r, s, all_finished = env.observe()
+            total_r +=r
+            total_d += env.total_traveled_distance
+            agent.observe(reward=r, terminal=terminal)
+            input("!")
+=======
             env.act(agent.act(s)) #, deterministic=True))
             terminal, r, s = env.observe()
             total_r +=r
             total_d += env.total_traveled_distance
             agent.observe(reward=r, terminal=terminal)
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
 
         episodes_r.append(total_r)
         episodes_d.append(env.total_traveled_distance)
@@ -607,6 +691,14 @@ if __name__ == "__main__":
             agent.save_model(directory="data/data", append_timestep=False)
             print("Saved!")
 
+<<<<<<< HEAD
+        if all_finished:
+            agent.save_model(directory="data/data", append_timestep=False)
+            print("All finished")
+            exit()
+
+=======
+>>>>>>> bc22da9c4c7f15ed83c05bf9792dc39395fe87f2
         with open("reward_history.csv", "a") as csvfile:
             writer = csv.writer(csvfile)
 
