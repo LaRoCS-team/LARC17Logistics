@@ -1,0 +1,18 @@
+<launch>
+<!-- Launch the world map node -->
+<node pkg="world_grid" type="world_grid_node"
+name="world_grid_node" output="screen">
+<remap from="state_id" to="mah_oe" />
+</node>
+<!-- Launch the grid map visualizer -->
+
+<node pkg="grid_map_visualization"
+type="grid_map_visualization"
+name="grid_map_visualization" output="screen">
+<rosparam command="load" file="$(find
+world_grid)/config/world_grid.yaml" />
+<remap from="grid_map_visualization/traversability_grid" to="map" />
+</node>
+<!-- Launch RViz with the demo configuration -->
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world_grid)/launch/world_grid_rviz.rviz"/>
+</launch>
