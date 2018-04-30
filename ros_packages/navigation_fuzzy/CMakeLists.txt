@@ -4,7 +4,7 @@ project(navigation_fuzzy)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-set(fuzzylite /home/wallace/FuzzyLite/fuzzylite-6.0)
+set(fuzzylite /home/previato/programs/fuzzylite-6.0)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -150,7 +150,6 @@ add_executable(fuzzy_server
     #desvia-node
     src/Desvia.cpp
     src/Desvia_node.cpp
-    #include/fuzzy/Desvia.hpp
   )
 
 ## Rename C++ executable without prefix
@@ -161,7 +160,7 @@ add_executable(fuzzy_server
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(fuzzy_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(fuzzy_server
