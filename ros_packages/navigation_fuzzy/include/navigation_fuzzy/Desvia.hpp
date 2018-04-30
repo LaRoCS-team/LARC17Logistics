@@ -21,19 +21,19 @@ class Desvia {
 public:
 	      Desvia(std::string name);
         void distanceSensorsCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
-				void spin();
-				//void executeCB(const fuzzy::FuzzyGoalConstPtr &goal);
+		void spin();
+		//void executeCB(const fuzzy::FuzzyGoalConstPtr &goal);
 
-				void goalCB();
+		void goalCB();
         void preemptCB();
 private:
         time_t name;
         ros::NodeHandle nh;
-	      ros::Subscriber getDistanceSensors;
+	  	ros::Subscriber getDistanceSensors;
         ros::Publisher pubTwistMsg;
-				actionlib::SimpleActionServer<navigation_fuzzy::FuzzyAction> as_;
-				std::string action_name_;
-				navigation_fuzzy::FuzzyFeedback feedback_;
+		actionlib::SimpleActionServer<navigation_fuzzy::FuzzyAction> as_;
+		std::string action_name_;
+		navigation_fuzzy::FuzzyFeedback feedback_;
         navigation_fuzzy::FuzzyResult result_;
 
 				void print(const std::string str);
