@@ -84,7 +84,7 @@ void Desvia::executeCB(const fuzzy::FuzzyGoalConstPtr &goal) {
 void Desvia::goalCB() {
     goal_ = as_.acceptNewGoal()->order;
     print("New goal set.");
-    std::cout << "t3" << std::endl;
+    std::cout << "goal is " << goal_ << std::endl;
 }
 
 void Desvia::preemptCB() {
@@ -94,19 +94,18 @@ void Desvia::preemptCB() {
 }
 
 void Desvia::spin() {
-	  ros::Rate lr(node_loop_rate);
+    ros::Rate lr(node_loop_rate);
     while(nh.ok()) {
 		    if(!as_.isActive()) {
 			      std::cout <<"No fuzzy goal active" << std::endl;
 		    }
 		    else {
-			      std::cout << "fuzzy active!" << std::endl;
+            std::cout << "fuzzy active!" << std::endl;
 
             float intEsqS = 100*squareDistance(pointsDetected[1]);
             float esqS = 100*squareDistance(pointsDetected[2]);
             float dirS = 100*squareDistance(pointsDetected[7]);
             float intDirS = 100*squareDistance(pointsDetected[8]);
-            bool success = true;
 
             if ((intEsqS > 0 && intEsqS < MAX_SQUARE_RADIUS_INT) ||  (esqS > 0 && esqS < MAX_SQUARE_RADIUS_SIDES) || (intDirS > 0 && intDirS < MAX_SQUARE_RADIUS_INT) || (dirS > 0 && dirS < MAX_SQUARE_RADIUS_SIDES)) {
                 using namespace fl;
@@ -133,12 +132,13 @@ void Desvia::spin() {
                 tw.angular.z = this->angular->getValue();
                 cout << "linX:" << tw.linear.x <<" linY:" << tw.linear.y <<" ang:" << tw.angular.z << "\n";
 
-                feedback_.feed = true;
-                as_.publishFeedback(feedback_);
+                /*feedback_.feed = true;
+                as_.publishFeedback(feedback_);*/
 
                 pubTwistMsg.publish(tw);
             } else {
-                result_.res = success;
+                result_.res = true;
+                std::cout << "fuzzy finished!" << std::endl;
                 as_.setSucceeded(result_);
             }
         }
@@ -155,13 +155,14 @@ Desvia::Desvia(std::string name) :
 	  //time(&this->name);
     //std::cout << "Name at construct " << this->name << "/n";
     //ros::NodeHandle nh;
-	  this->getDistanceSensors = nh.subscribe("distance_sensors", 1, &Desvia::distanceSensorsCallback, this);
+    this->getDistanceSensors = nh.subscribe("distance_sensors", 1, &Desvia::distanceSensorsCallback, this);
+    pubTwistMsg = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 
     as_.registerGoalCallback(boost::bind(&Desvia::goalCB, this));
     as_.registerPreemptCallback(boost::bind(&Desvia::preemptCB, this));
 
-	  std_msgs::Bool aux;
-	  aux.data = false;
+    std_msgs::Bool aux;
+    aux.data = false;
 
     //init fuzzy
     using namespace fl;

@@ -1,0 +1,18 @@
+<launch>
+<include file="$(find robotino_node)/launch/robotino_node.launch">
+</include>
+
+<!-- Launch the world map node -->
+<include file="$(find world_grid)/launch/world_grid.launch">
+</include>
+
+<!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find nav_robotino)/maps/map.pgm 0.08"/>
+
+<!-- Move_base -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+ <param name="base_global_planner" value="navfn/NavfnROS"/>
+    <rosparam file="$(find nav_robotino)/config/dynamic/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find nav_robotino)/config/dynamic/costmap_common_params.yaml" command="load" ns="local_costmap" />
+  </node>
+</launch>
