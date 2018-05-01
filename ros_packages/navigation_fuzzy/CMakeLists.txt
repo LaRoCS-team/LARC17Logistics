@@ -4,7 +4,7 @@ project(navigation_fuzzy)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-set(fuzzylite /home/wallace/FuzzyLite/fuzzylite-6.0)
+#set(fuzzylite /home/wallace/FuzzyLite/fuzzylite-6.0)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -126,14 +126,14 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS} #${Boost_INCLUDE_DIRS}
   #"${FUZZY_PATH}"
-     ${fuzzylite}/release/bin
-     ${fuzzylite}/fuzzylite
+     $ENV{FUZZY_PATH}/release/bin
+     $ENV{FUZZY_PATH}/fuzzylite
 )
 
 
 link_directories(
-   ${fuzzylite}/release/bin
-   ${fuzzylite}/fuzzylite
+   $ENV{FUZZY_PATH}/release/bin
+   $ENV{FUZZY_PATH}/fuzzylite
 )
 
 
@@ -163,6 +163,14 @@ add_executable(fuzzy_server
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+## Add cmake target dependencies of the library
+## as an example, code may need to be generated before libraries
+## either from message generation or dynamic reconfigure
+add_dependencies(fuzzy_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+    navigation_fuzzy_generate_messages_cpp
+#    ${fuzzy_EXPORTED_TARGETS}
+)
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(fuzzy_server
    #desvia-node
@@ -170,13 +178,7 @@ target_link_libraries(fuzzy_server
    fuzzylite
 )
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-#add_dependencies(${PROJECT_NAME}_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
-#    fuzzy_generate_messages_cpp
-#    ${fuzzy_EXPORTED_TARGETS}
-#)
+
 
 #############
 ## Install ##
