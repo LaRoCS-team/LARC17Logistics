@@ -465,7 +465,7 @@ class Env1:
 
         terminal = False
 
-        reward = 100 * (Env1.t_reward) - self.robot.traveled_distance/10
+        reward = (10000 * (Env1.t_reward) + 1000 - self.robot.traveled_distance/100)/100
         Env1.total_traveled_distance += self.robot.traveled_distance
         if self.steps == 50:
             terminal = True
@@ -484,7 +484,7 @@ class Env1:
                         if self.steps == 24:
                             Env1.total_optimal_matches += 1
                             print("Optimal match! Counting: %s" %Env1.total_optimal_matches)
-                            if Env1.total_optimal_matches == 20:
+                            if Env1.total_optimal_matches == 5:
                                 all_finished = True
                         else:
                             Env1.total_optimal_matches = 0
@@ -578,33 +578,33 @@ if __name__ == "__main__":
 
     episodes_r = []
     episodes_d = []
-    for e in range(1000000):
+    for e in range(2000000):
         # print("New configuration")
-        point_cloud = list(itertools.permutations(range(0, 19), 2))
+        # point_cloud = list(itertools.permutations(range(0, 19), 2))
+        #
+        # points = [point_cloud.pop(randint(0, len(point_cloud) - 1)) for _ in range(10)]
+        #
+        # env = Env1(red_machine_pos=    points.pop(randint(0, len(points) - 1)),
+        #            blue_machine_pos=   points.pop(randint(0, len(points) - 1)),
+        #            yellow_machine_pos= points.pop(randint(0, len(points) - 1)),
+        #            dock_position=      points.pop(randint(0, len(points) - 1)),
+        #            dc1_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc2_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc3_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc4_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc5_pos=            points.pop(randint(0, len(points) - 1)),
+        #            dc6_pos=            points.pop(randint(0, len(points) - 1)))
 
-        points = [point_cloud.pop(randint(0, len(point_cloud) - 1)) for _ in range(10)]
-
-        env = Env1(red_machine_pos=    points.pop(randint(0, len(points) - 1)),
-                   blue_machine_pos=   points.pop(randint(0, len(points) - 1)),
-                   yellow_machine_pos= points.pop(randint(0, len(points) - 1)),
-                   dock_position=      points.pop(randint(0, len(points) - 1)),
-                   dc1_pos=            points.pop(randint(0, len(points) - 1)),
-                   dc2_pos=            points.pop(randint(0, len(points) - 1)),
-                   dc3_pos=            points.pop(randint(0, len(points) - 1)),
-                   dc4_pos=            points.pop(randint(0, len(points) - 1)),
-                   dc5_pos=            points.pop(randint(0, len(points) - 1)),
-                   dc6_pos=            points.pop(randint(0, len(points) - 1)))
-
-        # env = Env1(red_machine_pos=    [18, 18],
-        #            blue_machine_pos=   [18, 17],
-        #            yellow_machine_pos= [18, 16],
-        #            dock_position=      [18, 0],
-        #            dc1_pos=            [0, 18],
-        #            dc2_pos=            [0, 17],
-        #            dc3_pos=            [0, 16],
-        #            dc4_pos=            [0, 15],
-        #            dc5_pos=            [0, 14],
-        #            dc6_pos=            [0, 13])
+        env = Env1(red_machine_pos=    [18, 18],
+                   blue_machine_pos=   [18, 17],
+                   yellow_machine_pos= [18, 16],
+                   dock_position=      [18, 0],
+                   dc1_pos=            [0, 18],
+                   dc2_pos=            [0, 17],
+                   dc3_pos=            [0, 16],
+                   dc4_pos=            [0, 15],
+                   dc5_pos=            [0, 14],
+                   dc6_pos=            [0, 13])
 
         total_r = 0
         total_d = 0
