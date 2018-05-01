@@ -124,8 +124,8 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS} #${Boost_INCLUDE_DIRS}
   #"${FUZZY_PATH}"
-  $ENV{FUZZY_PATH}/release/bin
-  $ENV{FUZZY_PATH}/fuzzylite
+     $ENV{FUZZY_PATH}/release/bin
+     $ENV{FUZZY_PATH}/fuzzylite
 )
 
 
@@ -160,6 +160,14 @@ add_executable(fuzzy_server
 ## same as for the library above
 add_dependencies(fuzzy_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+## Add cmake target dependencies of the library
+## as an example, code may need to be generated before libraries
+## either from message generation or dynamic reconfigure
+add_dependencies(fuzzy_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+    navigation_fuzzy_generate_messages_cpp
+#    ${fuzzy_EXPORTED_TARGETS}
+)
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(fuzzy_server
    #desvia-node
@@ -167,13 +175,7 @@ target_link_libraries(fuzzy_server
    fuzzylite
 )
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-#add_dependencies(${PROJECT_NAME}_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
-#    fuzzy_generate_messages_cpp
-#    ${fuzzy_EXPORTED_TARGETS}
-#)
+
 
 #############
 ## Install ##
