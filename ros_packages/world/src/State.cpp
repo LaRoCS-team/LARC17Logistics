@@ -3,7 +3,7 @@
 State::State(){
     
     //Necessary variables;
-    int i = 0, nMachines = 0, nDCs = 0;
+    int i = 0;
     float x = 0.0, y = 0.0, phi = 0.0;
     char buffer[20]; 
 
