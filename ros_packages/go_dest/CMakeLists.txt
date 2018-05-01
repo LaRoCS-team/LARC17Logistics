@@ -10,7 +10,9 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
+  nav_manager
   geometry_msgs
+  robotino_msgs
   message_generation
   roscpp
   rospy
