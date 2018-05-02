@@ -2,7 +2,11 @@
 # license removed for brevity
 import rospy, actionlib
 from std_msgs.msg import String
+
 from deliver_puck.msg import DeliverPuckAction, DeliverPuckGoal
+from grab_puck.msg import GrabPuckAction, GrabPuckGoal
+from go_dest.msg import GoDestAction, GoDestGoal
+
 import subprocess
 
 from world import InterestPoint
@@ -11,15 +15,19 @@ class CretinoMind:
     BRAIN_PATH = "/home/figo/catkin_ws/src/ml_node/src/brain.py"
 
     def __init__(self):
+        rospy.init_node('ml_node', anonymous=True)
+
         self.state = 30 * [0]
+
+        self.current_in = 0
 
         self.world = []
 
-        self.brain = subprocess.Popen([CretinoMind.BRAIN_PATH],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
+        # self.brain = subprocess.Popen([CretinoMind.BRAIN_PATH],
+        #     stdin=subprocess.PIPE,
+        #     stdout=subprocess.PIPE)
 
-        print("Brain is thinking! %s" %(self.brain.stdout.readline()))
+        # print("Brain is thinking! %s" %(self.brain.stdout.readline()))
 
         self.encode_initial_state()
 
@@ -83,25 +91,27 @@ class CretinoMind:
         self.state[23] = 3
 
         # Machines discrete positions
-        p = (rospy.get_param("/Machine1/x"), rospy.get_param("/Machine1/y"))
+        p = (rospy.get_param("/Maquina1/x"), rospy.get_param("/Maquina1/y"))
         p = self.discpos(p)
         self.state[24], self.state[25] = p[0], p[1]
         self.world.append(InterestPoint(InterestPoint.Type.MACHINE, p,
             InterestPoint.ColorEncode.RED))
 
-        p = (rospy.get_param("/Machine2/x"), rospy.get_param("/Machine2/y"))
+        p = (rospy.get_param("/Maquina2/x"), rospy.get_param("/Maquina2/y"))
         p = self.discpos(p)
         self.state[26], self.state[27] = p[0], p[1]
         self.world.append(InterestPoint(InterestPoint.Type.MACHINE, p,
             InterestPoint.ColorEncode.YELLOW))
 
-        p = (rospy.get_param("/Machine3/x"), rospy.get_param("/Machine3/y"))
+        p = (rospy.get_param("/Maquina3/x"), rospy.get_param("/Maquina3/y"))
         p = self.discpos(p)
         self.state[28], self.state[29] = p[0], p[1]
         self.world.append(InterestPoint(InterestPoint.Type.MACHINE, p,
             InterestPoint.ColorEncode.BLUE))
 
-        self.world += dcs
+        p = [rospy.get_param("/DockStation/x"),
+            rospy.get_param("/DockStation/y")]
+        self.world += [InterestPoint(InterestPoint.Type.DOCK, p)] + dcs
 
     def print_state(self):
         print("State:")
@@ -126,7 +136,6 @@ class CretinoMind:
         print("- Machine 2 position: %s" %([self.state[26], self.state[27]]))
         print("- Machine 3 position: %s" %([self.state[28], self.state[29]]))
 
-
     def act(self):
         state = ""
 
@@ -138,44 +147,54 @@ class CretinoMind:
         action = int(self.brain.stdout.readline())
 
         if action <= 9:
-            # Go dest
-            # p = self.world[action].position
-            # self.state[1] = p[0]
-            # self.state[2] = p[1]
-            pass
+            if self.go_dest(action):
+                self.state[1], self.state[2] = self.map[action].position[0], self.map[action].position[0]
 
         elif action == 10:
             # Grab puck
-            pass
+            if self.grab_puck():
+                self.state[0] = self.world[self.current_in].get_puck()
 
         elif action == 11:
-            pass
-            # deliver puck
+            # Deliver puck
+            if self.deliver_puck():
+                self.state[3 + (self.current_in - 4)]
+                    .deliver_puck(self.state[0])
+
+                self.state[0] = 0
 
 
-def talker():
-    pub = rospy.Publisher('chatter', String, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
+    def go_dest(self, dest):
+        client = actionlib.SimpleActionClient('go_dest', GrabPuckAction)
+        client.wait_for_server()
 
-    # cretino = CretinoMind()
+        goal = GrabPuckGoal(order=dest)
 
-    # cretino.act()
+        client.send_goal(goal)
 
-    client = actionlib.SimpleActionClient('deliver_puck', DeliverPuckAction)
-    goal = DeliverPuckGoal()
-    goal.action_id = 10
-    client.send_goal(goal)
-    client.wait_for_result(rospy.Duration.from_sec(5.0))
+        return client.wait_for_result()
 
-    while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
-        rate.sleep()
+    def grab_puck(self):
+        client = actionlib.SimpleActionClient('grab_puck', GrabPuckAction)
+        client.wait_for_server()
+
+        goal = GrabPuckGoal(color_id=3)
+
+        client.send_goal(goal)
+
+        return client.wait_for_result()
+
+    def deliver_puck(self):
+        client = actionlib.SimpleActionClient('deliver_puck', DeliverPuckAction)
+        client.wait_for_server()
+
+        goal = DeliverPuckGoal(action_id=10)
+
+        client.send_goal(goal)
+
+        return client.wait_for_result()
+
 
 if __name__ == '__main__':
-    try:
-        talker()
-    except rospy.ROSInterruptException:
-        pass
+    cretino = CretinoMind()
+    cretino.grab_puck()
