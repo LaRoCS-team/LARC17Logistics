@@ -5,7 +5,7 @@
 #include "puck_info/PuckInfo.hpp"
 #include "puck_info/PuckInfoMsg.h"
 
-#include <std_msgs/UInt32.h>
+#include <std_msgs/UInt64.h>
 
 using cv::Mat;
 using cv::flip;
@@ -32,6 +32,7 @@ PuckInfo::PuckInfo(): loopRate(2)
 {
     image_transport::ImageTransport imgTrans(node);
     imgSub = imgTrans.subscribe("image_raw", 2, &PuckInfo::imageCallback, this);
+    sensor_sub_ = node.subscribe("distance_sensors", 10, &PuckInfo::sensorCallback, this);
 
     pub = node.advertise<puck_info::PuckInfoMsg>("puck_info", 10);
 
@@ -119,28 +120,28 @@ void PuckInfo::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 vector<Scalar> PuckInfo::initColorVector(vector<Scalar> colors)
 {
     // NO Color
-    colors.emplace_back(Scalar(0, 0, 0));
+    colors.push_back(Scalar(0, 0, 0));
 
     // NO Color
-    colors.emplace_back(Scalar(0, 0, 0));
+    colors.push_back(Scalar(0, 0, 0));
 
     // MIN Yellow 20
-    colors.emplace_back(Scalar(20, 25, 0));
+    colors.push_back(Scalar(20, 25, 0));
 
     // MAX Yellow 40
-    colors.emplace_back(Scalar(40, 255, 255));
+    colors.push_back(Scalar(40, 255, 255));
 
     // MIN Green 50
-    colors.emplace_back(Scalar(50, 25, 0));
+    colors.push_back(Scalar(50, 25, 0));
 
     // MAX Green 70
-    colors.emplace_back(Scalar(70, 255, 255));
+    colors.push_back(Scalar(70, 255, 255));
 
     // MIN Red 0
-    colors.emplace_back(Scalar(0, 25, 0));
+    colors.push_back(Scalar(0, 25, 0));
 
     // MAX Red 10
-    colors.emplace_back(Scalar(10, 255, 255));
+    colors.push_back(Scalar(10, 255, 255));
 
     // MIN object size
     objMinSize = 0;
@@ -305,20 +306,83 @@ pair<int, Point> PuckInfo::findPuck(Mat frame, vector<Scalar> colors, int desire
     return pair<int, Point>(largerId / 2, largerCentroid.second.first);
 }
 
+double normDistance(const double a, const double b, const double c) {
+    return sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2));
+}
+
+double sigmoidFunction(double a) {
+    return 1 / (1 + std::exp(-a));
+}
+
+double parSigmoidFunction(double a, double par1, double par2) {
+    return sigmoidFunction((a + par1) * par2);
+}
+
+void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
+{
+    //cout << "Estou no callback" << endl;
+//    distance_x_ = msg->points[0].x;
+//    distance_y_ = msg->points[0].y;
+//    distance_z_ = msg->points[0].z;
+//
+//    double distance = normDistance(distance_x_, distance_y_, distance_z_);
+//
+//    double weight_sensors = parSigmoidFunction(-distance, 0.24, 40);
+//    double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 16.0/frame_.rows);
+
+    // double weight_sensors = parSigmoidFunction(-distance, 0.22, 40);
+    // double weight_camera = parSigmoidFunction(puck.second.y, -frame_.rows/2, 8.0/frame_.rows);
+
+//    double puck_prob = weight_camera + weight_sensors;
+
+    // Prob approach
+//    has_puck_ = puck_prob >= 1.0;
+
+
+    //Empirical approach
+    //Simulator measures indicate that has_puck should be true when centroid_y >= 218 and 135 <= centroid_x <= 165
+    //In theory, centroid_x could be bounded between 145 and 155, but the oscillations indicate it is best to use a wider range.
+    has_puck_ = (puck.second.y >= CENTROID_Y_LOWER_BOUND && CENTROID_X_LOWER_BOUND <= puck.second.x <= CENTROID_X_UPPER_BOUND);
+
+    std::string has_puck_str;
+    if (has_puck_) has_puck_str = "true";
+    else has_puck_str = "false";
+
+    print("HasPuck: \t" + has_puck_str + "\n");
+
+    // Linear approach
+    /*if(distance < 0.25) {
+        grabbed_puck_ = true;
+        has_puck_sensor_ = true;
+        //std::cout<< "PuckSensor:" << puckSensor<<"\n";
+    }
+    else {
+        if (grabbed_puck_ && distance < 0.3) {
+            has_puck_sensor_ = true;
+        }
+        else {
+            has_puck_sensor_ = false;
+            grabbed_puck_ = false;
+        }
+    }
+
+    has_puck_ = has_puck_sensor_;*/
+    //print("ha = %s, distancex = %f, distancey = %f, distancez = %f", ha?"true":"false", distance, distancey, distancez);
+}
+
+
 void PuckInfo::spin()
 {
     ros::Rate lr(loopRate);
     while (node.ok()) {
-        // Checking puck status
-        checkPuck();
-
         // Setting ROS mesage
         puck_info::PuckInfoMsg puck_info_msg;
         puck_info_msg.color = puck.first;
         puck_info_msg.center.x = puck.second.x;
         puck_info_msg.center.y = puck.second.y;
         puck_info_msg.center.z = 0;
-        puck_info_msg.has_puck = static_cast<unsigned char>(has_puck_);
+        puck_info_msg.has_puck = has_puck_;
+//        puck_info_msg.has_puck = true;
 
         pub.publish(puck_info_msg);
         teste_pub_.publish(msg);
@@ -326,12 +390,4 @@ void PuckInfo::spin()
         ros::spinOnce();
         lr.sleep();
     }
-}
-
-void PuckInfo::checkPuck() {
-    has_puck_ = (puck.second.y >= CENTROID_Y_LOWER_BOUND &&
-                 puck.second.x >= CENTROID_X_LOWER_BOUND &&
-                 puck.second.x <= CENTROID_X_UPPER_BOUND);
-
-    print("HasPuck: \t" + std::to_string(has_puck_) + "\n");
 }
