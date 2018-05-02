@@ -114,7 +114,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES nav_manager
-   CATKIN_DEPENDS actionlib actionlib_msgs message_generation roscpp rospy std_msgs navigation_fuzzy
+  CATKIN_DEPENDS actionlib actionlib_msgs message_generation roscpp rospy std_msgs navigation_fuzzy
 #  DEPENDS system_lib
 )
 
@@ -152,7 +152,8 @@ set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX ""
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+nav_manager_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
@@ -206,3 +207,8 @@ target_link_libraries(${PROJECT_NAME}_node
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+#add_executable(manager-node src/manager-node.cpp src/Manager.cpp)
+#target_link_libraries(manager-node ${catkin_LIBRARIES})
+#add_dependencies(manager-node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+#nav_manager_generate_messages_cpp)
+

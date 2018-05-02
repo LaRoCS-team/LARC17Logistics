@@ -6,7 +6,7 @@ Go::Go(std::string name):as_(n, name, boost::bind(&Go::calcPose, this, _1), fals
     subWorldState = n.subscribe("state", 1, &Go::world_state_msg_Callback, this);
     
     //initialize last_msg vectors.
-    for(int i = 0; i < 12; i++)
+    for(int i = 0; i < 9; i++)
         for(int j = 0; j < 3; j++)
             last_msg[i][j] = 0;
     
@@ -18,21 +18,22 @@ void Go::calcPose(const go_dest::GoDestGoalConstPtr &goal){
     int Id = goal->order;
     
     //find the pose, since it has an ID.
-    if(Id < 12){
-        pose_full.header.frame_id = "map";
-        quat = tf::createQuaternionMsgFromYaw(last_msg[Id][2]);
-        pose_full.pose.position.x = last_msg[Id][0];
-        pose_full.pose.position.y = last_msg[Id][1];;
-        pose_full.pose.position.z = 0;
-        pose_full.pose.orientation = quat;
-    }
-    if(Id == 15){
+    if(Id == 0){
         //bot gets back to the initial pose.
         pose_full.header.frame_id = "odom";
         pose_full.pose.position.x = 0;
         pose_full.pose.position.y = 0;
         pose_full.pose.position.z = 0;
     }
+    else {
+        pose_full.header.frame_id = "map";
+        quat = tf::createQuaternionMsgFromYaw(last_msg[Id-1][2]);
+        pose_full.pose.position.x = last_msg[Id-1][0];
+        pose_full.pose.position.y = last_msg[Id-1][1];;
+        pose_full.pose.position.z = 0;
+        pose_full.pose.orientation = quat;
+    }
+
 
     result_.sequence = this->sendGoalToNav(pose_full);
     
@@ -46,16 +47,16 @@ void Go::world_state_msg_Callback(const world::State::ConstPtr& msg){
     int i;
 
     //get the current poses from the WorldState.
-    for(i = 0; i < 12; i++){
-        if(i < 6){
+    for(i = 0; i < 9; i++){
+        if(i < 3){
             last_msg[i][0] = msg->machines[i].goalPose.x;
             last_msg[i][1] = msg->machines[i].goalPose.y;
             last_msg[i][2] = msg->machines[i].goalPose.theta;
         }
         else{
-            last_msg[i][0] = msg->dcs[i - 6].goalPose.x;
-            last_msg[i][1] = msg->dcs[i - 6].goalPose.y;
-            last_msg[i][2] = msg->dcs[i - 6].goalPose.theta;
+            last_msg[i][0] = msg->dcs[i - 3].goalPose.x;
+            last_msg[i][1] = msg->dcs[i - 3].goalPose.y;
+            last_msg[i][2] = msg->dcs[i - 3].goalPose.theta;
         }
     }
 }

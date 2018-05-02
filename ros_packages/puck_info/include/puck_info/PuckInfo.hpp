@@ -56,7 +56,8 @@ private:
     double objMaxSize;
     pair<int, Point> puck;
 
-    int CENTROID_Y_LOWER_BOUND {200};
+    // int CENTROID_Y_UPPER_BOUND {165};
+    int CENTROID_Y_LOWER_BOUND {180};
     int CENTROID_X_LOWER_BOUND {135};
     int CENTROID_X_UPPER_BOUND {165};
 
@@ -68,6 +69,8 @@ private:
 
     NodeHandle node;
     Publisher pub;
+    Subscriber camSub;
+    Subscriber sensor_sub_;
 
     Rate loopRate;
     image_transport::Subscriber imgSub;
@@ -79,9 +82,9 @@ private:
 
     cv::Mat frame_;
 
-    void print(const std::string str);
 
-    void checkPuck();
+    void sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
+    void print(const std::string str);
 };
 
 

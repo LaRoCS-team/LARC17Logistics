@@ -1,4 +1,4 @@
-//
+  //
 // Created by rafael on 05/11/17.
 //
 
@@ -103,8 +103,8 @@ void DeliverPuck::puckInfoCallback (const puck_info::PuckInfoMsg::ConstPtr& msg)
 
 void DeliverPuck::digitalReadingsCallback(const robotino_msgs::DigitalReadings::ConstPtr &msg) {
     //0 - right_sensor, 1 - left_sensor
-    right_sensor_flag = !(msg->values[0]);
-    left_sensor_flag = !(msg->values[1]);
+    right_sensor_flag = msg->values[0];
+    left_sensor_flag = msg->values[1];
 }
 
 void DeliverPuck::actionIdCallback (const std_msgs::UInt64::ConstPtr& msg) {
@@ -190,11 +190,11 @@ void DeliverPuck::align_horizontal() {
     if (avg_slope < -LINE_SLOPE_THRESHOLD || avg_slope > LINE_SLOPE_THRESHOLD) {
         if (avg_slope < 0) {
             print("Estamos na condicao avg slope < 0\n");
-            cmd_vel_msg.angular.z = -ANGULAR_VEL;
+            cmd_vel_msg.angular.z = ANGULAR_VEL;
         }
         else {
             print("Estamos na condicao avg slope > 0\n");
-            cmd_vel_msg.angular.z = ANGULAR_VEL;
+            cmd_vel_msg.angular.z = -ANGULAR_VEL;
         }
     }
     else {
@@ -240,6 +240,7 @@ void DeliverPuck::align_vertical() {
 
         } else {
             aligned_vertical_flag = true;
+            // exit(1);
         }
     }
 }
@@ -252,6 +253,8 @@ void DeliverPuck::move_to_distribution_center(vector<cv::Vec4i> lines) {
     if (right_sensor_flag && left_sensor_flag) {
         cmd_vel_msg.linear.x = 0;
         stop_flag = true;
+        // print("Finished moving forward");
+        // exit(1);
     }
     else {
         cmd_vel_msg.linear.x = .1;
@@ -269,23 +272,6 @@ void DeliverPuck::finish_delivery() {
         finished_flag = true;
     }
 }
-
-//void DeliverPuck::reset_odometry() {
-//    robotino_msgs::ResetOdometry srv;
-//    srv.request.x = world_state_x;
-//    srv.request.y = world_state_y;
-//    srv.request.phi = world_state_theta;
-//    print("world state x = %f, y = %f, theta = %f", world_state_x, world_state_y, world_state_theta);
-//
-//    if (client.call(srv))
-//    {
-//        print("True!!! Resetou!");
-//    }
-//    else {
-//        ROS_ERROR("Failed to call service");
-//    }
-//
-//}
 
 void DeliverPuck::executeCB(const deliver_puck::DeliverPuckGoalConstPtr &goal) {
     print("We received the goal %d\n", goal->action_id);

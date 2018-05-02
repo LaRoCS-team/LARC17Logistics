@@ -197,4 +197,4 @@ class CretinoMind:
 
 if __name__ == '__main__':
     cretino = CretinoMind()
-    cretino.grab_puck()
+    cretino.deliver_puck()
