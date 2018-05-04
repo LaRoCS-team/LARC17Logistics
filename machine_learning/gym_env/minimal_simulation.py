@@ -484,7 +484,7 @@ class Env1:
                         if self.steps == 24:
                             Env1.total_optimal_matches += 1
                             print("Optimal match! Counting: %s" %Env1.total_optimal_matches)
-                            if Env1.total_optimal_matches == 5:
+                            if Env1.total_optimal_matches == 15:
                                 all_finished = True
                         else:
                             Env1.total_optimal_matches = 0
@@ -595,16 +595,16 @@ if __name__ == "__main__":
         #            dc5_pos=            points.pop(randint(0, len(points) - 1)),
         #            dc6_pos=            points.pop(randint(0, len(points) - 1)))
 
-        env = Env1(red_machine_pos=    [18, 18],
-                   blue_machine_pos=   [18, 17],
-                   yellow_machine_pos= [18, 16],
-                   dock_position=      [18, 0],
-                   dc1_pos=            [0, 18],
-                   dc2_pos=            [0, 17],
-                   dc3_pos=            [0, 16],
-                   dc4_pos=            [0, 15],
-                   dc5_pos=            [0, 14],
-                   dc6_pos=            [0, 13])
+        env = Env1(red_machine_pos=    [19, 19],
+                   blue_machine_pos=   [19, 18],
+                   yellow_machine_pos= [19, 17],
+                   dock_position=      [19, 0],
+                   dc1_pos=            [0, 19],
+                   dc2_pos=            [0, 18],
+                   dc3_pos=            [0, 17],
+                   dc4_pos=            [0, 16],
+                   dc5_pos=            [0, 15],
+                   dc6_pos=            [0, 14])
 
         total_r = 0
         total_d = 0
@@ -614,11 +614,12 @@ if __name__ == "__main__":
             env.render()
 
             env.act(agent.act(s)) #, deterministic=True))
+            # env.act(int(input("Action")))
             terminal, r, s, all_finished = env.observe()
             total_r +=r
-            total_d += env.total_traveled_distance
+            # total_d += env.total_traveled_distance
             agent.observe(reward=r, terminal=terminal)
-            # input("!")
+            # print(env.robot.traveled_distance)
 
         episodes_r.append(total_r)
         episodes_d.append(env.total_traveled_distance)
@@ -642,4 +643,4 @@ if __name__ == "__main__":
         with open("reward_history.csv", "a") as csvfile:
             writer = csv.writer(csvfile)
 
-            writer.writerow([total_r, total_d])
+            writer.writerow([total_r, env.total_traveled_distance])
