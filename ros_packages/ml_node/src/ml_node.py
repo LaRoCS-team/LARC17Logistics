@@ -32,7 +32,7 @@ class CretinoMind:
         self.encode_initial_state()
 
     def discpos(self, pos):
-        DISCRETE_FACTOR = 20
+        DISCRETE_FACTOR = 1
         return (int((pos[0] * 100)/DISCRETE_FACTOR),
             int((pos[1] * 100)/DISCRETE_FACTOR))
 
@@ -136,6 +136,10 @@ class CretinoMind:
         print("- Machine 2 position: %s" %([self.state[26], self.state[27]]))
         print("- Machine 3 position: %s" %([self.state[28], self.state[29]]))
 
+    def think(self):
+        while True:
+            self.act()
+
     def act(self):
         state = ""
 
@@ -195,8 +199,5 @@ class CretinoMind:
 
 
 if __name__ == '__main__':
-    cretino = CretinoMind()
-    cretino.go_dest(1)
-    cretino.grab_puck()
-    cretino.go_dest(4)
-    creino.deliver_puck()
+    a = int(input("Action"))
+    self.act(a)
