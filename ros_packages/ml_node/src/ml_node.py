@@ -158,17 +158,16 @@ class CretinoMind:
         elif action == 11:
             # Deliver puck
             if self.deliver_puck():
-                self.state[3 + (self.current_in - 4)]
-                    .deliver_puck(self.state[0])
+                self.state[3 + (self.current_in - 4)].deliver_puck(self.state[0])
 
                 self.state[0] = 0
 
 
     def go_dest(self, dest):
-        client = actionlib.SimpleActionClient('go_dest', GrabPuckAction)
+        client = actionlib.SimpleActionClient('go_dest', GoDestAction)
         client.wait_for_server()
 
-        goal = GrabPuckGoal(order=dest)
+        goal = GoDestGoal(order=dest)
 
         client.send_goal(goal)
 
@@ -197,4 +196,7 @@ class CretinoMind:
 
 if __name__ == '__main__':
     cretino = CretinoMind()
-    cretino.deliver_puck()
+    cretino.go_dest(1)
+    cretino.grab_puck()
+    cretino.go_dest(4)
+    creino.deliver_puck()

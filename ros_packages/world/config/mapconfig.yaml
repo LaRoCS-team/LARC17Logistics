@@ -1,8 +1,11 @@
 Numero_maquinas: 6
+DockStation:
+  x: 0.0
+  y: 0.0
 Maquina1:
-  x: 0.65
-  y: 2.15
-  phi: -15
+  x: 0.4
+  y: 2.56
+  phi: 45
 Maquina2:
   x: 2.15
   y: 2.50
@@ -25,9 +28,9 @@ Maquina6:
   phi: 90
 Numero_DCs: 6
 DC1:
-  x: 0.65
-  y: 2.15
-  phi: 0
+  x: 3.04
+  y: 2.56
+  phi: 45
 DC2:
   x: 0.65
   y: 2.15
@@ -48,4 +51,3 @@ DC6:
   x: 0.65
   y: 2.15
   phi: 0
-
