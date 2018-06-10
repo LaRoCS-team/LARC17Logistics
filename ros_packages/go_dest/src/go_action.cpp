@@ -46,7 +46,7 @@ void Go::calcPose(const go_dest::GoDestGoalConstPtr &goal){
 void Go::world_state_msg_Callback(const world::State::ConstPtr& msg){
     int i;
 
-    //get the current poses from the WorldState.
+    //get the current poses from the WorldState node.
     for(i = 0; i < 9; i++){
         if(i < 3){
             last_msg[i][0] = msg->machines[i].goalPose.x;
