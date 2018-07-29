@@ -17,12 +17,14 @@
     <rosparam file="$(find nav_robotino)/config/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find nav_robotino)/config/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find nav_robotino)/config/base_local_planner_params.yaml" command="load" />
+
+
+    <param name="base_local_planner" value="robotino_local_planner/RobotinoLocalPlanner" />
+    <param name="controller_frequency" value="3.0" />
+    <param name="planner_frequency" value="1.0" />
   </node>
 
-<node pkg="nav_manager" type="manager_node" respawn="false" name="manager_node" output="screen">
-</node>
-
-<node pkg="navigation_fuzzy" type="fuzzy_server" respawn="false" name="fuzzy_server" output="screen">
-</node>
-
+  <node pkg="nav_manager" type="manager_node" respawn="false" name="manager_node" output="screen" />
+  <node pkg="navigation_fuzzy" type="fuzzy_server" respawn="false" name="fuzzy_server" output="screen" />
+  <node pkg="world" type="world_node" respawn="false" name="world_server" output="screen" />
 </launch>
