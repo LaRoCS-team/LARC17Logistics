@@ -5,7 +5,7 @@
 using namespace grid_map;
 using namespace std;
 //Alterar parâmetros da competição por aqui, no construtor:
-const float res = 0.04;
+const float res = 0.08;
 //const int nMachines = 6, nDcs = 4;
 
 MapCreator::MapCreator(): map({"occup"}),loopRate(5){

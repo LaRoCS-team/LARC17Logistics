@@ -140,20 +140,20 @@ class CretinoMind:
         while True:
             self.act()
 
-    def act(self):
+    def act(self, action):
         state = ""
 
         for s in self.state:
             state += str(s) + " "
 
-        self.brain.stdin.write("%s\n" %(state))
+        # self.brain.stdin.write("%s\n" %(state))
 
-        action = int(self.brain.stdout.readline())
+#        action = int(self.brain.stdout.readline())
 
         if action <= 9:
             if self.go_dest(action):
                 self.state[1], self.state[2] = self.map[action].position[0], self.map[action].position[0]
-
+            
         elif action == 10:
             # Grab puck
             if self.grab_puck():
@@ -199,5 +199,6 @@ class CretinoMind:
 
 
 if __name__ == '__main__':
+    c = CretinoMind()
     a = int(input("Action"))
-    self.act(a)
+    c.act(a)

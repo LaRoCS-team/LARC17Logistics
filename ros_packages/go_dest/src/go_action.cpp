@@ -21,9 +21,10 @@ void Go::calcPose(const go_dest::GoDestGoalConstPtr &goal){
     if(Id == 0){
         //bot gets back to the initial pose.
         pose_full.header.frame_id = "odom";
-        pose_full.pose.position.x = 0;
-        pose_full.pose.position.y = 0;
+        pose_full.pose.position.x = 2.5;
+        pose_full.pose.position.y = 1;
         pose_full.pose.position.z = 0;
+        pose_full.pose.orientation.w = 1.0;
     }
     else {
         pose_full.header.frame_id = "map";

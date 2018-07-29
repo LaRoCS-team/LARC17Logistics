@@ -1,6 +1,5 @@
-controller_frequency: 15
 TrajectoryPlannerROS:
-  max_vel_x: 0.2
+  max_vel_x: 2.0
   min_vel_x: 0.05
   max_vel_theta: 0.5
   min_in_place_vel_theta: 0.1
@@ -9,5 +8,23 @@ TrajectoryPlannerROS:
   acc_lim_x: 2.5
   acc_lim_y: 2.5
 
+  xy_goal_tolerance: 0.0
+  latch_xy_goal_tolerance: true
+
+  pdist_scale: 5.0
+  gdist_scale: 5.0
+  
+  sim_time: 5.0
+  sim_granularity: 0.005
+
+  dwa: false
+
   holonomic_robot: true
-#  meter_scoring: true
+  meter_scoring: true
+
+RobotinoLocalPlanner:
+
+  heading_lookahead: 0.5
+  max_linear_vel: 1.0
+  min_linear_vel: 0.5
+  max_rotation_vel: 1.0
