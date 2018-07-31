@@ -28,7 +28,7 @@ class Go{
         void world_state_msg_Callback(const world::State::ConstPtr& msg);
         bool sendGoalToNav(geometry_msgs::PoseStamped pose);
     private:
-        float last_msg[12][3];
+        float last_msg[13][3];
         geometry_msgs::Quaternion quat;
         geometry_msgs::PoseStamped pose_full;
         ros::NodeHandle n;
