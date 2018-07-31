@@ -97,7 +97,7 @@ void Desvia::spin() {
     ros::Rate lr(node_loop_rate);
     while(nh.ok()) {
 		    if(!as_.isActive()) {
-			      std::cout <<"No fuzzy goal active" << std::endl;
+			      //std::cout <<"No fuzzy goal active" << std::endl;
 		    }
 		    else {
             std::cout << "fuzzy active!" << std::endl;
