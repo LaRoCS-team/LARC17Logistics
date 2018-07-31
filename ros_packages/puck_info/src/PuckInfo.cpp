@@ -119,29 +119,37 @@ void PuckInfo::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 // Initialize the range of all three the detectable colors
 vector<Scalar> PuckInfo::initColorVector(vector<Scalar> colors)
 {
-    // NO Color
-    colors.push_back(Scalar(0, 0, 0));
+    std::vector<int> color;
 
     // NO Color
     colors.push_back(Scalar(0, 0, 0));
 
+    // NO Color
+    colors.push_back(Scalar(0, 0, 0));
+
+    ros::param::get("/MinYellow", color);
     // MIN Yellow 20
-    colors.push_back(Scalar(20, 25, 0));
+    colors.push_back(Scalar(color[0], color[1], color[2]));
 
+    ros::param::get("/MaxYellow", color);
     // MAX Yellow 40
-    colors.push_back(Scalar(40, 255, 255));
+    colors.push_back(Scalar(color[0], color[1], color[2]));
 
+    ros::param::get("/MinGreen", color);
     // MIN Green 50
-    colors.push_back(Scalar(50, 25, 0));
+    colors.push_back(Scalar(color[0], color[1], color[2]));
 
+    ros::param::get("/MaxGreen", color);
     // MAX Green 70
-    colors.push_back(Scalar(70, 255, 255));
+    colors.push_back(Scalar(color[0], color[1], color[2]));
 
+    ros::param::get("/MinRed", color);
     // MIN Red 0
-    colors.push_back(Scalar(0, 25, 0));
+    colors.push_back(Scalar(color[0], color[1], color[2]));
 
+    ros::param::get("/MaxRed", color);
     // MAX Red 10
-    colors.push_back(Scalar(10, 255, 255));
+    colors.push_back(Scalar(color[0], color[1], color[2]));
 
     // MIN object size
     objMinSize = 0;
@@ -275,7 +283,7 @@ pair<int, Point> PuckInfo::findPuck(Mat frame, vector<Scalar> colors, int desire
     pair<int, pair<Point, int> > largerCentroid;
 
 
-    cvtColor(frame, hsv, cv::COLOR_RGB2HSV);
+    cvtColor(frame, hsv, cv::COLOR_BGR2HSV);
 
     if(desiredColor != -1)
         desiredColor *= 2;
