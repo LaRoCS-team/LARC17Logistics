@@ -23,8 +23,12 @@
     <param name="controller_frequency" value="3.0" />
     <param name="planner_frequency" value="1.0" />
   </node>
-
-  <node pkg="nav_manager" type="manager_node" respawn="false" name="manager_node" output="screen" />
-  <node pkg="navigation_fuzzy" type="fuzzy_server" respawn="false" name="fuzzy_server" output="screen" />
-  <node pkg="world" type="world_node" respawn="false" name="world_server" output="screen" />
+  
+  <!--- Inicializa o servidor de parametros com as posicoes de cada maquina/DC -->
+  <include file="$(find world)/launch/state.launch"/>
+  
+  <node pkg="world" type="world_node" respawn="false" name="world_node" output="screen" />
+  <node pkg="nav_manager" type="node" respawn="false" name="nav_manager" output="screen" />
+  <node pkg="navigation_fuzzy" type="fuzzy_server" respawn="false" name="navigation_fuzzy" output="screen" />
+  <node pkg="go_dest" type="go_dest" respawn="false" name="go_dest" output="screen" />
 </launch>
