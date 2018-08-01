@@ -1,7 +1,9 @@
-Numero_maquinas: 6
-DockStation:
+Numero_docks: 1
+Dock1:
   x: 0.0
   y: 0.0
+  phi: 45
+Numero_maquinas: 6
 Maquina1:
   x: 0.4
   y: 2.56
@@ -51,3 +53,11 @@ DC6:
   x: 0.65
   y: 2.15
   phi: 0
+MinRed: [0, 25, 0]
+MaxRed: [10, 255, 255]
+MinGreen: [45, 25, 0]
+MaxGreen: [115, 255, 255]
+# MinYellow: [15, 25, 0]
+# MaxYellow: [40, 255, 255]
+MinYellow: [0,0,0]
+MaxYellow: [0,0,0]
