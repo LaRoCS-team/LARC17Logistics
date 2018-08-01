@@ -149,8 +149,10 @@ add_executable(${PROJECT_NAME}_node
    # src/puck_finder_node.cpp
     #src/CheckPuck.cpp
     src/PuckInfo.cpp
+    src/NewPuckInfo.cpp
     include/puck_info/PuckInfo.hpp
-)
+    include/puck_info/NewPuckInfo.hpp
+        include/puck_info/Color.hpp include/puck_info/Centroid.hpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
