@@ -8,6 +8,6 @@ world)/config/mapconfig.yaml" />
 name="state_node" output="screen"/>
 
 <!-- Launch RViz with the demo configuration -->
-<node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/map_creator_rviz.rviz"/>
+<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find world)/rviz/map_creator_rviz.rviz"/> -->
 
 </launch>

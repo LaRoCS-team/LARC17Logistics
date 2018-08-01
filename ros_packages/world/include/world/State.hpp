@@ -3,6 +3,7 @@
 #include <vector>
 #include "world/Machine.hpp"
 #include "world/DistrCenter.hpp"
+#include "world/Dock.hpp"
 #include "nav_msgs/Odometry.h"
 #include <std_msgs/Int32.h>
 #include "world/Pose2d.hpp"
@@ -29,7 +30,10 @@ class State{
     	int task;
     	//Machines and DCs
 		std::vector<Machine> machines;
-    	std::vector<DistrCenter> dcs;
+  	std::vector<DistrCenter> dcs;
+		std::vector<Dock> docks;
+
 		int nMachines;
 		int nDCs;
+		int nDocks;
 };
