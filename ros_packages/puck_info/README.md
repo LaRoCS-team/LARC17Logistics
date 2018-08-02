@@ -1,11 +1,11 @@
 # Puck Info (puck_info)
 
-## Description
+## 1. Description
 
 Puck Info is responsible for giving information about the biggest Puck visible.
 It gives the color of the Puck, the coordinates (x, y) of the Puck's centroid and if the claw has the Puck.
 
-## Message
+## 2. Message
 
 Puck Info has its own message type. **PuckInfoMsg**.
 
@@ -17,7 +17,7 @@ It's composed by:
 - geometry_msgs/Point center
 - int64 color
 
-## Dependencies
+## 3. Dependencies
 
 Puck Info depends on the following packages:
 
@@ -30,7 +30,7 @@ Puck Info depends on the following packages:
 - image_transport	(for generating PuckInfoMsg)
 - message_generation	(for generating PuckInfoMsg)
 
-## How to run puck_info
+## 4. How to run puck_info
 
 Use `rosrun` to run the node puck_info
 
@@ -49,4 +49,15 @@ rosrun puck_info puck_info_node _debug:=true _vrep:=false
 ```
 
 Pay attention to the parameter syntax. (_< parameterName >:=< value >)
+
+  ### 4.1. debug parameter
+
+The __debug__ parameter makes some information of the detection to be showed in the STDOUT.
+Also it open windows with the image obtained from the camera with a circle marker on the 
+centroid of the respective color in the window name.
+
+  ### 4.2. vrep parameter
+
+The __vrep__ parameter makes the image obtained from the Vrep simulator to be flipped, because
+Vrep sends the image from the camera flipped.
 
