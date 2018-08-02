@@ -24,9 +24,29 @@ Puck Info depends on the following packages:
 - roscpp
 - std_msgs
 - cv_bridge 		(for OpenCV image conversion)
-- geometry_msgs 	(for __center__ informatio)
+- geometry_msgs 	(for __center__ information)
 - sensor_msgs 		(for the robot sensor readings)
 - genmsg		(for generating PuckInfoMsg)
 - image_transport	(for generating PuckInfoMsg)
 - message_generation	(for generating PuckInfoMsg)
+
+## How to run puck_info
+
+Use `rosrun` to run the node puck_info
+
+```commandline
+rosrun puck_info puck_info_node
+```
+
+The package puck_info has 2 additional parameters to help debugging and run puck_info
+in a VREP simulation.
+
+The parameters __debug__ and __vrep__ have boolean values, you can set them true or false, 
+example:
+
+```commandline
+rosrun puck_info puck_info_node _debug:=true _vrep:=false
+```
+
+Pay attention to the parameter syntax. (_< parameterName >:=< value >)
 

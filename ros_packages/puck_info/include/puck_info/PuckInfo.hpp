@@ -26,6 +26,9 @@
 #include <string>
 #include <cmath>
 
+#include "Color.hpp"
+#include "Centroid.hpp"
+
 using std::vector;
 using std::pair;
 using std::pow;
@@ -34,8 +37,6 @@ using std::sqrt;
 using cv::Mat;
 using cv::Scalar;
 using cv::Point;
-
-using namespace ros;
 
 class PuckInfo {
 public:
@@ -49,11 +50,25 @@ public:
 
 private:
     // TODO: DELETA ISSO PF
+    ros::NodeHandle nh_;
+    ros::Publisher puck_info_pub_;
+    ros::Subscriber dist_sensors_sub_;
+    ros::Rate loop_rate_;
+
+    image_transport::Subscriber img_sub_;
+
     image_transport::Publisher teste_pub_;
+
+    cv::Mat frame_;
+
+    vector<Color> colors_;
+
+    double obj_min_size_;
+    double obj_max_size_;
+
     sensor_msgs::ImagePtr msg;
 
-    double objMinSize;
-    double objMaxSize;
+
     pair<int, Point> puck;
 
     // int CENTROID_Y_UPPER_BOUND {165};
@@ -61,18 +76,19 @@ private:
     int CENTROID_X_LOWER_BOUND {135};
     int CENTROID_X_UPPER_BOUND {165};
 
-    pair<int, pair<Point, int> > detectColor(Mat frame, Mat hsv, Scalar minColor, Scalar maxColor, int colorIndex);
-    Mat getTreatedInRangeHSV(Mat hsv, Scalar minColor, Scalar maxColor);
+
+    //pair<Mat, pair<Point, int> > filterCentroid(Mat frame, Mat mask, Mat labels, Mat status, Mat centroids, int i);
+
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
-    pair<Mat, pair<Point, int> > filterCentroid(Mat frame, Mat mask, Mat labels, Mat status, Mat centroids, int i);
-    vector<Scalar> initColorVector(vector<Scalar> colors);
+    void initColorVector();
+    Centroid findPuck();
+    void getMaskInRangeHSV(const Mat &hsv, const Scalar &min_color, const Scalar &max_color, Mat &mask);
+    void getMaskRectangles(Mat &mask);
+    void filterCentroid(Mat &mask, Mat labels, Mat status, Mat centroids, Color_e color_index,
+                        Point &mask_centroid_point, int &mask_centroid_index);
+    Centroid detectColor(const Mat &hsv, const Scalar &min_color,
+                                                       const Scalar &max_color, Color_e color_index);
 
-    NodeHandle node;
-    Publisher pub;
-    Subscriber camSub;
-    Subscriber sensor_sub_;
-
-    Rate loopRate;
     image_transport::Subscriber imgSub;
     double distance_x_, distance_y_, distance_z_;
     bool grabbed_puck_ {false};
@@ -80,12 +96,11 @@ private:
 
     bool has_puck_ {false};
 
-    cv::Mat frame_;
+
 
 
     void sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg);
     void print(const std::string str);
 };
-
 
 #endif //PUCK_INFO_PUCKINFO_HPP

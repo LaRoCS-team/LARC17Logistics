@@ -18,7 +18,7 @@ enum class Color_e {
     none = -1
 };
 
-std::string to_string(Color_e color) {
+std::string color_to_string(Color_e &color) {
     switch (color){
         case Color_e::yellow:
             return std::string("yellow");
@@ -39,6 +39,8 @@ struct Color {
     Color(int a, int b, int c, int d, int e, int f, Color_e color) : color(color) {
         min = {a, b, c};
         max = {d, e, f};
+    }
+    Color(Scalar min, Scalar max, Color_e color) : min(min), max(max), color(color) {
     }
 };
 
