@@ -54,10 +54,8 @@ DC6:
   y: 2.15
   phi: 0
 MinRed: [0, 25, 0]
-MaxRed: [10, 255, 255]
+MaxRed: [20, 255, 255]
 MinGreen: [45, 25, 0]
 MaxGreen: [115, 255, 255]
-# MinYellow: [15, 25, 0]
-# MaxYellow: [40, 255, 255]
-MinYellow: [0,0,0]
-MaxYellow: [0,0,0]
+MinYellow: [25, 25, 0]
+MaxYellow: [40, 255, 255]
