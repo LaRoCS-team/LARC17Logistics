@@ -70,6 +70,7 @@ private:
 
 
     pair<int, Point> puck;
+    Centroid puck_;
 
     // int CENTROID_Y_UPPER_BOUND {165};
     int CENTROID_Y_LOWER_BOUND {180};

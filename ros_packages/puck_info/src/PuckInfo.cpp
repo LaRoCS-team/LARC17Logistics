@@ -285,7 +285,7 @@ void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
     //Empirical approach
     //Simulator measures indicate that has_puck should be true when centroid_y >= 218 and 135 <= centroid_x <= 165
     //In theory, centroid_x could be bounded between 145 and 155, but the oscillations indicate it is best to use a wider range.
-    has_puck_ = (puck.second.y >= CENTROID_Y_LOWER_BOUND && CENTROID_X_LOWER_BOUND <= puck.second.x <= CENTROID_X_UPPER_BOUND);
+    has_puck_ = (puck_.point.y >= CENTROID_Y_LOWER_BOUND && CENTROID_X_LOWER_BOUND <= puck_.point.x && puck_.point.x <= CENTROID_X_UPPER_BOUND);
 
     std::string has_puck_str;
     if (has_puck_) has_puck_str = "true";
@@ -298,7 +298,7 @@ void PuckInfo::sensorCallback(const sensor_msgs::PointCloud::ConstPtr& msg)
 void PuckInfo::spin()
 {
     while (nh_.ok()) {
-        Centroid puck = findPuck();
+        puck_ = findPuck();
 
         system("clear");
         std::cout << std::boolalpha;
@@ -306,19 +306,19 @@ void PuckInfo::spin()
         std::cout << "V-REP mode: " << vrep_mode_ << std::endl;
         std::cout << "\n\n\n";
 
-        if(puck.index == -1) {
+        if(puck_.index == -1) {
             print("Nothing found\n");
         }
         else {
-            print("Color: \t" + color_to_string(puck.color) + "\n");
-            print("Centroid: \t" + std::to_string(puck.point.x) + " " + std::to_string(puck.point.y) + "\n");
+            print("Color: \t" + color_to_string(puck_.color) + "\n");
+            print("Centroid: \t" + std::to_string(puck_.point.x) + " " + std::to_string(puck_.point.y) + "\n");
         }
 
         // Setting ROS mesage
         puck_info::PuckInfoMsg puck_info_msg;
-        puck_info_msg.color = static_cast<int>(puck.color);
-        puck_info_msg.center.x = puck.point.x;
-        puck_info_msg.center.y = puck.point.y;
+        puck_info_msg.color = static_cast<int>(puck_.color);
+        puck_info_msg.center.x = puck_.point.x;
+        puck_info_msg.center.y = puck_.point.y;
         puck_info_msg.center.z = 0;
         puck_info_msg.has_puck = static_cast<unsigned char>(has_puck_);
 
