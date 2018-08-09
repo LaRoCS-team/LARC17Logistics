@@ -89,7 +89,8 @@ void GrabPuckAction::spin() {
                     print("Going to Puck");
 
                     goToPuck();
-                } else {
+                }
+                else {
                     SPEED_VEL = 0;
                     TURN_VEL = 0;
 
@@ -166,7 +167,7 @@ void GrabPuckAction::goToPuck()
     SPEED_VEL = arcTgWithPar(0.9*CAMERA_HEIGHT - puck_center_Y_, 0.05, 0.025, -2.5, M_PI_2);
     print("Linear vel: "+ std::to_string(SPEED_VEL));
 
-    TURN_VEL = arcTgWithPar(CAMERA_WIDTH/2 - puck_center_X_, 0.15, 0.01, 0, 0);
+    TURN_VEL = arcTgWithPar(CAMERA_WIDTH/2 - puck_center_X_, 0.15, 0.015, 0, 0);
     print("Angular vel: "+ std::to_string(TURN_VEL));
 }
 
