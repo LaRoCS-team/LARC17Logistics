@@ -2,3 +2,4 @@ cmake-build-debug/
 .catkin_tools/
 .idea/
 .clang_complete
+*tags
