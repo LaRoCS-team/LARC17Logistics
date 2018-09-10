@@ -64,3 +64,5 @@ Since this was recorded with artificial lights the red is harder to isolate, the
 example is a terrible isolation.
 
 ## Have Fun!
+
+Created by: guilherme dot vieira dot leite at gmail dot com
