@@ -16,7 +16,7 @@ Its a python3 application to facilitate the webcam tuning of Robotino.
     4. The original video input;
     5. The calibration output;
 
-![interface](./webcam_tuner/examples/interface.png)
+![interface](./webcam_tuner/examples/interface.jpg)
 
 * The sliders are grouped in three sets of two. Each set has a \_L and a \_H,
 representing **L**ow and **H**igh.
@@ -44,17 +44,17 @@ between the Low and High value.
 > These values will change depending on lighting conditions, so pay attention to
 your environment.
 
-![exampleAll](./webcam_tuner/examples/all.png)
+![exampleAll](./webcam_tuner/examples/all.jpg)
 In this image almost every color was isolated, so the output looks the same as
 the camera input.
 
-![exampleGreen](./webcam_tuner/examples/green.png)
+![exampleGreen](./webcam_tuner/examples/green.jpg)
 Example values to isolate the green color.
 
-![exampleBlue](./webcam_tuner/examples/blue.png)
+![exampleBlue](./webcam_tuner/examples/blue.jpg)
 Example vales to isolate the blue color. Usually with natural light this color
 is harder to isolate.
 
-![exampleRed](./webcam_tuner/examples/red.png)
+![exampleRed](./webcam_tuner/examples/red.jpg)
 Since this was recorded with artificial lights the red is harder to isolate, the
 example is a terrible isolation.
