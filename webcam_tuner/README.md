@@ -16,13 +16,13 @@ Its a python3 application to facilitate the webcam tuning of Robotino.
     4. The original video input;
     5. The calibration output;
 
-![interface](/examples/interface.png)
+![interface](./examples/interface.png)
 
 * The sliders are grouped in three sets of two. Each set has a \_L and a \_H,
 representing **L**ow and **H**igh.
 * Normally colors are represented in a **R**ed **G**reen **B**lue space, in this
 application they are represented in **H**ue **S**aturation **B**rightness space.
-Visit [this](www.colorizer.org) website for more information.
+Visit [this](https://www.colorizer.org) website for more information.
 * The two colored spaces bellow the sliders and above the camera view are there
 so you can see which colors are being selected.
 * You want to calibrate the camera so that each color you want to identify stays
@@ -44,17 +44,17 @@ between the Low and High value.
 > These values will change depending on lighting conditions, so pay attention to
 your environment.
 
-![exampleAll](/examples/all.png)
+![exampleAll](./examples/all.png)
 In this image almost every color was isolated, so the output looks the same as
 the camera input.
 
-![exampleGreen](/examples/green.png)
+![exampleGreen](./examples/green.png)
 Example values to isolate the green color.
 
-![exampleBlue](/examples/blue.png)
+![exampleBlue](./examples/blue.png)
 Example vales to isolate the blue color. Usually with natural light this color
 is harder to isolate.
 
-![exampleRed](/examples/red.png)
+![exampleRed](./examples/red.png)
 Since this was recorded with artificial lights the red is harder to isolate, the
 example is a terrible isolation.
