@@ -41,20 +41,26 @@ between the Low and High value.
 
 #### Examples
 
-> These values will change depending on lighting conditions, so pay attention to
-your environment.
+*These values will change depending on lighting conditions, so pay attention to
+your environment.*
 
 ![exampleAll](./webcam_tuner/examples/all.jpg)
+
 In this image almost every color was isolated, so the output looks the same as
 the camera input.
 
 ![exampleGreen](./webcam_tuner/examples/green.jpg)
+
 Example values to isolate the green color.
 
 ![exampleBlue](./webcam_tuner/examples/blue.jpg)
+
 Example vales to isolate the blue color. Usually with natural light this color
 is harder to isolate.
 
 ![exampleRed](./webcam_tuner/examples/red.jpg)
+
 Since this was recorded with artificial lights the red is harder to isolate, the
 example is a terrible isolation.
+
+## Have Fun!
